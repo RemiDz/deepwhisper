@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/* Hide scrollbars globally */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+*::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
 :root {
   --void: #0A0A0F;
   --twilight: #12101E;
