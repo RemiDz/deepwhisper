@@ -1,0 +1,88 @@
+import { IntentionCategory } from '@/types/session';
+
+export const affirmationLibrary: Record<Exclude<IntentionCategory, 'custom'>, string[]> = {
+  confidence: [
+    'I trust myself deeply and completely',
+    'My voice matters and deserves to be heard',
+    'I am worthy of all the good that comes to me',
+    'Confidence flows through me naturally',
+    'I embrace my unique strengths',
+    'I release self-doubt with every breath',
+    'I stand tall in my truth',
+    'I am enough exactly as I am',
+  ],
+  abundance: [
+    'Wealth flows to me from expected and unexpected sources',
+    'I am open to receiving abundance in all forms',
+    'My work creates value and attracts prosperity',
+    'I deserve financial freedom and security',
+    'Opportunities are drawn to me effortlessly',
+    'I am grateful for the abundance already in my life',
+    'Money comes to me easily and frequently',
+    'I release all resistance to wealth',
+  ],
+  health: [
+    'My body knows how to heal itself',
+    'Every cell vibrates with health and energy',
+    'I release what no longer serves my wellbeing',
+    'I nourish my body with love and care',
+    'Healing energy flows through every part of me',
+    'I am strong, vital, and full of life',
+    'My immune system is powerful and resilient',
+    'I choose thoughts that support my health',
+  ],
+  sleep: [
+    'I release the day and welcome deep rest',
+    'My mind is calm, my body is peaceful',
+    'Sleep comes easily and naturally to me',
+    'I drift into deep, restorative sleep',
+    'My dreams are peaceful and healing',
+    'I let go of all tension and worry',
+    'Every breath takes me deeper into relaxation',
+    'I deserve this rest',
+  ],
+  focus: [
+    'My mind is clear, sharp, and focused',
+    'I direct my attention with ease and purpose',
+    'Distractions dissolve as I centre my awareness',
+    'I am fully present in this moment',
+    'My concentration strengthens with every session',
+    'I accomplish my goals with calm focus',
+    'Clarity comes to me effortlessly',
+    'I am in complete control of my attention',
+  ],
+  love: [
+    'I am worthy of deep, authentic love',
+    'Love flows freely to me and through me',
+    'I attract relationships that nourish my soul',
+    'My heart is open to giving and receiving love',
+    'I radiate warmth and compassion',
+    'I forgive freely and love unconditionally',
+    'I deserve healthy, loving connections',
+    'Love is my natural state of being',
+  ],
+  spiritual: [
+    'I am connected to something greater than myself',
+    'My intuition guides me with clarity',
+    'I trust the journey of my soul',
+    'I am aligned with my highest purpose',
+    'The universe supports my growth',
+    'I am a vessel for light and healing',
+    'My spiritual practice deepens every day',
+    'I am exactly where I need to be',
+  ],
+  creative: [
+    'Creative energy flows through me abundantly',
+    'I trust my creative instincts',
+    'Inspiration finds me in every moment',
+    'I create without fear or judgement',
+    'My unique expression matters',
+    'I allow ideas to flow freely through me',
+    'Creativity is my natural state',
+    'I bring beauty into everything I do',
+  ],
+};
+
+export const DEFAULT_SELECTED_COUNT = 5;
+export const MIN_AFFIRMATIONS = 3;
+export const MAX_AFFIRMATIONS = 15;
