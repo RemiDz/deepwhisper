@@ -1,159 +1,105 @@
 'use client';
 
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import OrbVisualiser from '@/components/OrbVisualiser';
-import ParticleField from '@/components/ParticleField';
-import GradientMesh from '@/components/GradientMesh';
-import GlassCard from '@/components/GlassCard';
+import ToolCard from '@/components/ToolCard';
 import EcosystemBadge from '@/components/EcosystemBadge';
+import Link from 'next/link';
 
-const features = [
-  {
-    title: 'Whisper',
-    description: 'Your affirmations, delivered beneath conscious awareness',
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-        <path d="M16 4C9.373 4 4 9.373 4 16s5.373 12 12 12 12-5.373 12-12S22.627 4 16 4z" stroke="var(--conscious)" strokeWidth="1.5" opacity="0.5" />
-        <path d="M12 16c0-2.21 1.79-4 4-4s4 1.79 4 4-1.79 4-4 4-4-1.79-4-4z" stroke="var(--conscious)" strokeWidth="1.5" />
-      </svg>
-    ),
-  },
-  {
-    title: 'Layer',
-    description: 'Binaural beats & healing frequencies deepen the experience',
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-        <path d="M8 16h3M13 10h3v12h-3zM18 13h3v6h-3zM23 8h3v16h-3z" stroke="var(--theta)" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    ),
-  },
-  {
-    title: 'Transform',
-    description: 'Repeated listening reshapes your thought patterns',
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-        <path d="M16 6v20M6 16h20" stroke="var(--glow)" strokeWidth="1.5" strokeLinecap="round" />
-        <circle cx="16" cy="16" r="10" stroke="var(--glow)" strokeWidth="1.5" opacity="0.3" />
-      </svg>
-    ),
-  },
-];
-
-export default function HomePage() {
+function WaveformIcon() {
   return (
-    <main className="relative min-h-screen">
-      <GradientMesh />
-      <ParticleField count={25} />
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <rect x="1" y="6" width="2" height="8" rx="1" fill="var(--accent)" />
+      <rect x="5" y="3" width="2" height="14" rx="1" fill="var(--accent)" />
+      <rect x="9" y="5" width="2" height="10" rx="1" fill="var(--accent)" />
+      <rect x="13" y="2" width="2" height="16" rx="1" fill="var(--accent)" />
+      <rect x="17" y="7" width="2" height="6" rx="1" fill="var(--accent)" />
+    </svg>
+  );
+}
 
+function FlashIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <rect x="3" y="3" width="14" height="10" rx="2" stroke="var(--success)" strokeWidth="1.5" />
+      <path d="M10 8l-2 4h4l-2 4" stroke="var(--success)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <line x1="7" y1="16" x2="13" y2="16" stroke="var(--success)" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function WallpaperIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <rect x="5" y="2" width="10" height="16" rx="2" stroke="var(--sacred)" strokeWidth="1.5" />
+      <line x1="7" y1="6" x2="13" y2="6" stroke="var(--sacred)" strokeWidth="0.5" opacity="0.4" />
+      <line x1="7" y1="8" x2="13" y2="8" stroke="var(--sacred)" strokeWidth="0.5" opacity="0.3" />
+      <line x1="7" y1="10" x2="13" y2="10" stroke="var(--sacred)" strokeWidth="0.5" opacity="0.2" />
+      <line x1="7" y1="12" x2="13" y2="12" stroke="var(--sacred)" strokeWidth="0.5" opacity="0.15" />
+      <line x1="7" y1="14" x2="11" y2="14" stroke="var(--sacred)" strokeWidth="0.5" opacity="0.1" />
+    </svg>
+  );
+}
+
+export default function LandingPage() {
+  return (
+    <main className="min-h-screen flex flex-col items-center justify-center px-6 py-20" style={{ background: 'var(--bg-deep)' }}>
       {/* Hero */}
-      <section className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 text-center">
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-4xl md:text-6xl mb-4 text-glow max-w-3xl"
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontStyle: 'italic',
-            fontWeight: 300,
-            color: 'var(--text-primary)',
-            lineHeight: 1.2,
-          }}
+      <div className="text-center mb-16 max-w-2xl">
+        <h1
+          className="text-5xl md:text-7xl mb-4 leading-tight"
+          style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
         >
-          What if your thoughts could hear whispers?
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-lg mb-10 max-w-xl"
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontWeight: 300,
-            color: 'var(--text-secondary)',
-          }}
-        >
-          Subliminal audio. Beautifully crafted. Scientifically grounded.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, delay: 0.4 }}
-          className="mb-10"
-        >
-          <OrbVisualiser size={300} className="md:hidden" />
-          <OrbVisualiser size={400} className="hidden md:block" />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          className="flex flex-col sm:flex-row gap-4"
-        >
-          <Link href="/create" className="btn-primary text-lg px-8 py-4 no-underline inline-block text-center">
-            Experience it
-          </Link>
-          <Link href="/learn" className="btn-glass text-lg px-8 py-4 no-underline inline-block text-center">
-            Learn how it works
-          </Link>
-        </motion.div>
-      </section>
-
-      {/* What is Deep Whisper */}
-      <section className="relative z-10 py-24 px-6">
-        <motion.h2
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-3xl md:text-4xl text-center mb-16"
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontStyle: 'italic',
-            fontWeight: 300,
-            color: 'var(--text-primary)',
-          }}
-        >
-          What is Deep Whisper?
-        </motion.h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          {features.map((feature, i) => (
-            <GlassCard key={feature.title} delay={i * 0.15} hoverable={false}>
-              <div className="mb-4">{feature.icon}</div>
-              <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}>
-                {feature.title}
-              </h3>
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                {feature.description}
-              </p>
-            </GlassCard>
-          ))}
-        </div>
-      </section>
-
-      {/* Ecosystem */}
-      <section className="relative z-10 py-16 px-6 text-center">
-        <EcosystemBadge />
-      </section>
-
-      {/* Footer */}
-      <footer className="relative z-10 py-8 px-6 text-center border-t" style={{ borderColor: 'var(--glass-border)' }}>
-        <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>
-          Built with 🔮 by{' '}
-          <a href="https://harmonicwaves.app" target="_blank" rel="noopener noreferrer" className="no-underline" style={{ color: 'var(--conscious)' }}>
-            Harmonic Waves
-          </a>
+          Create real subliminals.
+        </h1>
+        <p className="text-lg md:text-xl" style={{ color: 'var(--text-secondary)' }}>
+          Record. Process. Programme your subconscious.
         </p>
-        <div className="flex items-center justify-center gap-4 text-xs" style={{ color: 'var(--text-secondary)' }}>
-          <a href="https://deepwhisper.app" className="no-underline" style={{ color: 'var(--text-secondary)' }}>deepwhisper.app</a>
-          <span>·</span>
-          <a href="https://harmonicwaves.app" target="_blank" rel="noopener noreferrer" className="no-underline" style={{ color: 'var(--text-secondary)' }}>Harmonic Waves</a>
-        </div>
-      </footer>
+      </div>
+
+      {/* Tool Cards */}
+      <div className="w-full max-w-2xl space-y-4 mb-16">
+        <ToolCard
+          title="Audio Lab"
+          description="Record affirmations in your voice. Speed them up, layer beneath soundscapes, shift to ultrasonic. Export real subliminal audio."
+          cta="Open Audio Lab →"
+          href="/audio"
+          accentColor="var(--accent)"
+          icon={<WaveformIcon />}
+          delay={0}
+        />
+        <ToolCard
+          title="Visual Flash"
+          description="Flash affirmations on screen faster than you can read. Your subconscious catches every word."
+          cta="Open Visual Flash →"
+          href="/flash"
+          accentColor="var(--success)"
+          icon={<FlashIcon />}
+          delay={0.1}
+        />
+        <ToolCard
+          title="Subliminal Wallpaper"
+          description="Embed hidden affirmations into sacred geometry art. Download as your phone wallpaper."
+          cta="Create Wallpaper →"
+          href="/wallpaper"
+          accentColor="var(--sacred)"
+          icon={<WallpaperIcon />}
+          delay={0.2}
+        />
+      </div>
+
+      {/* Footer links */}
+      <div className="flex flex-col items-center gap-4">
+        <Link
+          href="/learn"
+          className="text-sm no-underline transition-colors"
+          style={{ color: 'var(--text-secondary)' }}
+        >
+          How do subliminals work?
+        </Link>
+        <EcosystemBadge />
+        <p className="text-xs mt-8" style={{ color: 'var(--text-dim)' }}>
+          deepwhisper.app
+        </p>
+      </div>
     </main>
   );
 }

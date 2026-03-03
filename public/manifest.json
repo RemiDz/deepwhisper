@@ -1,11 +1,11 @@
 {
-  "name": "Deep Whisper",
+  "name": "Deep Whisper — Subliminal Creation Studio",
   "short_name": "Deep Whisper",
-  "description": "Subliminal audio intelligence — create, visualise, and share personalised subliminal affirmation sessions",
+  "description": "Create real subliminal audio, visual flash sessions, and hidden-message wallpapers.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0A0A0F",
-  "theme_color": "#7B5EA7",
+  "background_color": "#08080C",
+  "theme_color": "#4A3AFF",
   "orientation": "portrait-primary",
   "icons": [
     {

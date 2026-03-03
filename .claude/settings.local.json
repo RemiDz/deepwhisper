@@ -5,7 +5,9 @@
       "Bash(npx create-next-app@latest:*)",
       "Bash(mkdir:*)",
       "Bash(npm run:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(rm:*)",
+      "Bash(npx next:*)"
     ]
   }
 }
