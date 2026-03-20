@@ -1,105 +1,155 @@
 'use client';
 
-import ToolCard from '@/components/ToolCard';
-import EcosystemBadge from '@/components/EcosystemBadge';
-import Link from 'next/link';
+import { useMemo, useState, useCallback } from 'react';
+import { getKinForDateFull } from '@/lib/dreamspell/kin';
+import { getOracle } from '@/lib/dreamspell/oracle';
+import { getMoonDate } from '@/lib/dreamspell/moons';
+import { getMoonData } from '@/lib/astronomy/moon';
+import { SEALS } from '@/lib/dreamspell/seals';
+import GalacticCompass from '@/components/compass/GalacticCompass';
+import KinStrip from '@/components/today/KinStrip';
+import MicroDashboard from '@/components/today/MicroDashboard';
+import MilestoneCard from '@/components/today/MilestoneCard';
+import BottomSheet from '@/components/layout/BottomSheet';
 
-function WaveformIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <rect x="1" y="6" width="2" height="8" rx="1" fill="var(--accent)" />
-      <rect x="5" y="3" width="2" height="14" rx="1" fill="var(--accent)" />
-      <rect x="9" y="5" width="2" height="10" rx="1" fill="var(--accent)" />
-      <rect x="13" y="2" width="2" height="16" rx="1" fill="var(--accent)" />
-      <rect x="17" y="7" width="2" height="6" rx="1" fill="var(--accent)" />
-    </svg>
-  );
-}
+export default function TodayPage() {
+  const [sheetContent, setSheetContent] = useState<{ title: string; body: React.ReactNode } | null>(null);
 
-function FlashIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <rect x="3" y="3" width="14" height="10" rx="2" stroke="var(--success)" strokeWidth="1.5" />
-      <path d="M10 8l-2 4h4l-2 4" stroke="var(--success)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <line x1="7" y1="16" x2="13" y2="16" stroke="var(--success)" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
+  const today = useMemo(() => new Date(), []);
+  const kin = useMemo(() => getKinForDateFull(today), [today]);
+  const oracle = useMemo(() => kin ? getOracle(kin) : null, [kin]);
+  const moonData = useMemo(() => getMoonData(today), [today]);
+  const moonDate = useMemo(() => getMoonDate(today), [today]);
 
-function WallpaperIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <rect x="5" y="2" width="10" height="16" rx="2" stroke="var(--sacred)" strokeWidth="1.5" />
-      <line x1="7" y1="6" x2="13" y2="6" stroke="var(--sacred)" strokeWidth="0.5" opacity="0.4" />
-      <line x1="7" y1="8" x2="13" y2="8" stroke="var(--sacred)" strokeWidth="0.5" opacity="0.3" />
-      <line x1="7" y1="10" x2="13" y2="10" stroke="var(--sacred)" strokeWidth="0.5" opacity="0.2" />
-      <line x1="7" y1="12" x2="13" y2="12" stroke="var(--sacred)" strokeWidth="0.5" opacity="0.15" />
-      <line x1="7" y1="14" x2="11" y2="14" stroke="var(--sacred)" strokeWidth="0.5" opacity="0.1" />
-    </svg>
-  );
-}
+  const handleCentreTap = useCallback(() => {
+    if (!kin || !oracle) return;
+    setSheetContent({
+      title: kin.title,
+      body: (
+        <div className="space-y-4">
+          <div className="text-center">
+            <div className="text-2xl font-bold" style={{ color: kin.seal.colourHex }}>Kin {kin.number}</div>
+            <div className="text-sm text-[var(--text-secondary)] mt-1">{kin.title}</div>
+          </div>
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <InfoRow label="Tone" value={`${kin.tone.name} — ${kin.tone.action}`} />
+            <InfoRow label="Seal" value={`${kin.seal.name} — ${kin.seal.action}`} />
+            <InfoRow label="Power" value={kin.seal.power} />
+            <InfoRow label="Essence" value={kin.seal.essence} />
+            <InfoRow label="Direction" value={kin.seal.direction} />
+            <InfoRow label="Wavespell" value={`${kin.wavespell}`} />
+          </div>
+          <div className="pt-2 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+            <div className="text-xs text-[var(--text-tertiary)] mb-2">FIFTH FORCE ORACLE</div>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <OraclePill label="Guide" seal={oracle.guide.name} colour={oracle.guide.colourHex} />
+              <OraclePill label="Analog" seal={oracle.analog.name} colour={oracle.analog.colourHex} />
+              <OraclePill label="Antipode" seal={oracle.antipode.name} colour={oracle.antipode.colourHex} />
+              <OraclePill label="Occult" seal={oracle.occult.name} colour={oracle.occult.colourHex} />
+            </div>
+          </div>
+        </div>
+      ),
+    });
+  }, [kin, oracle]);
 
-export default function LandingPage() {
+  const handleSealTap = useCallback((sealNumber: number) => {
+    const seal = SEALS[sealNumber];
+    setSheetContent({
+      title: seal.name,
+      body: (
+        <div className="space-y-3">
+          <div className="text-center">
+            <div className="text-xl font-bold" style={{ color: seal.colourHex }}>{seal.name}</div>
+            <div className="text-xs text-[var(--text-tertiary)]">Seal {seal.number + 1} of 20</div>
+          </div>
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <InfoRow label="Colour" value={seal.colour} />
+            <InfoRow label="Direction" value={seal.direction} />
+            <InfoRow label="Power" value={seal.power} />
+            <InfoRow label="Action" value={seal.action} />
+            <InfoRow label="Essence" value={seal.essence} />
+          </div>
+        </div>
+      ),
+    });
+  }, []);
+
+  if (!kin || !oracle) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center px-6">
+        <div className="text-[var(--purple)] text-lg font-medium">0.0 Hunab Ku</div>
+        <p className="text-[var(--text-secondary)] text-sm mt-2">
+          Today is the Day Out of Time — a day of pure being, beyond the count of days.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-6 py-20" style={{ background: 'var(--bg-deep)' }}>
-      {/* Hero */}
-      <div className="text-center mb-16 max-w-2xl">
-        <h1
-          className="text-5xl md:text-7xl mb-4 leading-tight"
-          style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
-        >
-          Create real subliminals.
+    <div className="flex flex-col h-full max-w-md mx-auto px-4 py-3">
+      {/* Header */}
+      <header className="text-center mb-1">
+        <h1 className="text-[10px] font-semibold tracking-[0.25em] text-[var(--text-tertiary)] uppercase">
+          Deep Whisper
         </h1>
-        <p className="text-lg md:text-xl" style={{ color: 'var(--text-secondary)' }}>
-          Record. Process. Programme your subconscious.
-        </p>
-      </div>
+        {moonDate.moon && (
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+            {moonDate.moon.name} · Day {moonDate.moonDay}
+          </p>
+        )}
+        {moonDate.isDayOutOfTime && (
+          <p className="text-xs text-[var(--purple)]">Day Out of Time</p>
+        )}
+      </header>
 
-      {/* Tool Cards */}
-      <div className="w-full max-w-2xl space-y-4 mb-16">
-        <ToolCard
-          title="Audio Lab"
-          description="Record affirmations in your voice. Speed them up, layer beneath soundscapes, shift to ultrasonic. Export real subliminal audio."
-          cta="Open Audio Lab →"
-          href="/audio"
-          accentColor="var(--accent)"
-          icon={<WaveformIcon />}
-          delay={0}
-        />
-        <ToolCard
-          title="Visual Flash"
-          description="Flash affirmations on screen faster than you can read. Your subconscious catches every word."
-          cta="Open Visual Flash →"
-          href="/flash"
-          accentColor="var(--success)"
-          icon={<FlashIcon />}
-          delay={0.1}
-        />
-        <ToolCard
-          title="Subliminal Wallpaper"
-          description="Embed hidden affirmations into sacred geometry art. Download as your phone wallpaper."
-          cta="Create Wallpaper →"
-          href="/wallpaper"
-          accentColor="var(--sacred)"
-          icon={<WallpaperIcon />}
-          delay={0.2}
+      {/* Galactic Compass — main focal element */}
+      <div className="flex-1 flex items-center justify-center min-h-0 -my-2">
+        <GalacticCompass
+          kin={kin}
+          oracle={oracle}
+          moonData={moonData}
+          onCentreTap={handleCentreTap}
+          onSealTap={handleSealTap}
         />
       </div>
 
-      {/* Footer links */}
-      <div className="flex flex-col items-center gap-4">
-        <Link
-          href="/learn"
-          className="text-sm no-underline transition-colors"
-          style={{ color: 'var(--text-secondary)' }}
-        >
-          How do subliminals work?
-        </Link>
-        <EcosystemBadge />
-        <p className="text-xs mt-8" style={{ color: 'var(--text-dim)' }}>
-          deepwhisper.app
-        </p>
+      {/* Kin Strip */}
+      <div className="space-y-3 pb-2">
+        <KinStrip kin={kin} moonData={moonData} />
+        <MicroDashboard kin={kin} />
+        <MilestoneCard kin={kin} />
       </div>
-    </main>
+
+      {/* Bottom Sheet */}
+      <BottomSheet
+        open={!!sheetContent}
+        onClose={() => setSheetContent(null)}
+        title={sheetContent?.title}
+      >
+        {sheetContent?.body}
+      </BottomSheet>
+    </div>
+  );
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <div className="text-[10px] text-[var(--text-tertiary)]">{label}</div>
+      <div className="text-[var(--text-primary)]">{value}</div>
+    </div>
+  );
+}
+
+function OraclePill({ label, seal, colour }: { label: string; seal: string; colour: string }) {
+  return (
+    <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg" style={{ background: 'var(--bg-card)' }}>
+      <div className="w-2 h-2 rounded-full" style={{ background: colour }} />
+      <div>
+        <div className="text-[9px] text-[var(--text-tertiary)]">{label}</div>
+        <div className="text-xs" style={{ color: colour }}>{seal}</div>
+      </div>
+    </div>
   );
 }

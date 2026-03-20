@@ -1,52 +1,44 @@
 import type { Metadata, Viewport } from 'next';
-import { Instrument_Serif, DM_Sans, IBM_Plex_Mono } from 'next/font/google';
+import { Geist } from 'next/font/google';
 import './globals.css';
+import TabBar from '@/components/layout/TabBar';
+import StarField from '@/components/layout/StarField';
 
-const instrumentSerif = Instrument_Serif({
-  weight: '400',
+const geistSans = Geist({
+  variable: '--font-geist-sans',
   subsets: ['latin'],
-  variable: '--font-display',
-  display: 'swap',
-});
-
-const dmSans = DM_Sans({
-  subsets: ['latin'],
-  variable: '--font-body',
-  display: 'swap',
-});
-
-const ibmPlexMono = IBM_Plex_Mono({
-  weight: ['400', '500'],
-  subsets: ['latin'],
-  variable: '--font-mono',
-  display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'Deep Whisper — Subliminal Creation Studio',
-  description: 'Create real subliminal audio, visual flash sessions, and hidden-message wallpapers. Record your affirmations, process with speed/reverse/ultrasonic techniques, and export. Free web tool.',
-  keywords: ['subliminal maker', 'subliminal audio', 'subliminal generator', 'create subliminals', 'subliminal messages', 'visual subliminal', 'subliminal wallpaper', 'affirmations'],
+  title: 'Deep Whisper — 13 Moon Galactic Calendar',
+  description: 'Navigate cosmic time with the Dreamspell 13 Moon calendar. Discover your Galactic Signature, track moon phases, and align with the Tzolkin.',
   openGraph: {
-    title: 'Deep Whisper — Subliminal Creation Studio',
-    description: 'Create real subliminal audio, visual flash sessions, and hidden-message wallpapers. Free.',
-    url: 'https://deepwhisper.app',
+    title: 'Deep Whisper — 13 Moon Galactic Calendar',
+    description: 'Navigate cosmic time with the Dreamspell 13 Moon calendar.',
     siteName: 'Deep Whisper',
   },
-  manifest: '/manifest.json',
 };
 
 export const viewport: Viewport = {
-  themeColor: '#4A3AFF',
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#080812',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <html lang="en" className={`${instrumentSerif.variable} ${dmSans.variable} ${ibmPlexMono.variable}`}>
-      <head>
-        <script defer data-domain="deepwhisper.app" src="https://plausible.io/js/script.js" />
-      </head>
-      <body>
-        {children}
+    <html lang="en" className={`${geistSans.variable} h-full antialiased dark`}>
+      <body className="h-[100dvh] flex flex-col overflow-hidden font-[var(--font-geist-sans)]">
+        <StarField />
+        <main className="flex-1 overflow-y-auto pb-[72px]" style={{ paddingBottom: 'calc(72px + env(safe-area-inset-bottom))' }}>
+          {children}
+        </main>
+        <TabBar />
       </body>
     </html>
   );
