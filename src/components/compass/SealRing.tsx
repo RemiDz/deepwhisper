@@ -29,11 +29,9 @@ export default function SealRing({ activeSealNumber, oracle, cx, cy, radius, onS
         const isActive = seal.number === activeSealNumber;
         const isOracle = oracleSeals.has(seal.number);
 
-        // Background opacity — MUCH brighter
-        const bgOpacity = isActive ? 0.9 : isOracle ? 0.7 : 0.45;
-        // Border
-        const borderW = isActive ? 1.5 : isOracle ? 1 : 0.7;
-        const borderOpacity = isActive ? 0.7 : isOracle ? 0.5 : 0.3;
+        const bgOpacity = isActive ? 0.9 : isOracle ? 0.7 : 0.35;
+        const borderW = isActive ? 2 : isOracle ? 1 : 0.5;
+        const borderOpacity = isActive ? 0.8 : isOracle ? 0.5 : 0.2;
 
         return (
           <g
@@ -41,6 +39,20 @@ export default function SealRing({ activeSealNumber, oracle, cx, cy, radius, onS
             onClick={() => onSealTap?.(seal.number)}
             className="cursor-pointer"
           >
+            {/* Static glow behind active seal — no animation */}
+            {isActive && (
+              <rect
+                x={sx - sq / 2 - 3}
+                y={sy - sq / 2 - 3}
+                width={sq + 6}
+                height={sq + 6}
+                rx={8}
+                fill="none"
+                stroke={seal.colourHex}
+                strokeWidth={1}
+                opacity={0.25}
+              />
+            )}
             {/* Background square */}
             <rect
               x={sx - sq / 2}
@@ -51,7 +63,7 @@ export default function SealRing({ activeSealNumber, oracle, cx, cy, radius, onS
               fill={seal.bgHex}
               opacity={bgOpacity}
             />
-            {/* Border */}
+            {/* Border — static, no animation */}
             <rect
               x={sx - sq / 2}
               y={sy - sq / 2}
@@ -62,9 +74,8 @@ export default function SealRing({ activeSealNumber, oracle, cx, cy, radius, onS
               stroke={seal.colourHex}
               strokeWidth={borderW}
               opacity={borderOpacity}
-              className={isActive ? 'animate-border-glow' : ''}
             />
-            {/* PNG icon — NEVER dimmed, always full opacity */}
+            {/* PNG icon — static, full opacity, no animation */}
             <image
               href={seal.iconPath}
               x={sx - iconSz / 2}

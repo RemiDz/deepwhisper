@@ -47,33 +47,6 @@ body {
   height: 100dvh;
 }
 
-/* Gentle opacity breathing — NO transform, NO scale */
-@keyframes breathe {
-  0%, 100% { opacity: 0.35; }
-  50% { opacity: 0.5; }
-}
-.animate-breathe {
-  animation: breathe 3s ease-in-out infinite;
-}
-
-/* Border glow pulse for active seal on compass */
-@keyframes border-glow {
-  0%, 100% { stroke-opacity: 0.5; }
-  50% { stroke-opacity: 1; }
-}
-.animate-border-glow {
-  animation: border-glow 2.5s ease-in-out infinite;
-}
-
-/* Glow animation (tone ring) */
-@keyframes glow {
-  0%, 100% { filter: drop-shadow(0 0 2px currentColor); }
-  50% { filter: drop-shadow(0 0 6px currentColor); }
-}
-.animate-glow {
-  animation: glow 3s ease-in-out infinite;
-}
-
 /* Star twinkle — static positions, only opacity changes */
 @keyframes twinkle {
   0%, 100% { opacity: 0.05; }

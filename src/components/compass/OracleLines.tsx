@@ -53,11 +53,12 @@ export default function OracleLines({ oracle, cx, cy, moonRadius, sealRingRadius
             <line
               x1={x1} y1={y1} x2={x2} y2={y2}
               stroke={style.colour}
-              strokeWidth={style.width}
-              opacity={0.38}
+              strokeWidth={0.8}
+              strokeDasharray="4 3"
+              opacity={0.15}
             />
             {/* Midpoint dot */}
-            <circle cx={mx} cy={my} r={2} fill={style.colour} opacity={0.5} />
+            <circle cx={mx} cy={my} r={1.5} fill={style.colour} opacity={0.25} />
           </g>
         );
       })}

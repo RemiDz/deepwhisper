@@ -10,29 +10,29 @@ interface KinStripProps {
 
 export default function KinStrip({ kin, moonData }: KinStripProps) {
   return (
-    <div className="text-center space-y-1.5">
-      {/* Kin number + title in a horizontal row */}
-      <div className="flex items-baseline justify-center gap-2.5">
-        <span className="text-[34px] font-bold tabular-nums leading-none text-white">
-          {kin.number}
-        </span>
-        <div className="text-left">
-          <div className="text-[15px] font-medium leading-tight" style={{ color: kin.seal.colourHex }}>
-            {kin.title}
-          </div>
-          <div className="text-[11px] text-[var(--text-secondary)] leading-tight">
-            {kin.tone.action} · {kin.tone.power} · {kin.tone.essence}
-          </div>
-        </div>
+    <div className="text-center space-y-1 overflow-visible w-full px-4">
+      {/* Kin number — large, bold, separate line */}
+      <div className="text-[32px] font-bold tabular-nums leading-none text-white">
+        {kin.number}
+      </div>
+
+      {/* Full title — seal colour, separate line */}
+      <div className="text-[17px] font-semibold leading-tight" style={{ color: kin.seal.colourHex }}>
+        {kin.title}
         {kin.isGAP && (
-          <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-[var(--purple-dim)] text-[var(--purple)] self-center">
+          <span className="ml-2 text-[9px] font-semibold px-1.5 py-0.5 rounded bg-[var(--purple-dim)] text-[var(--purple)] align-middle">
             GAP
           </span>
         )}
       </div>
 
+      {/* Tone keywords — muted, smallest */}
+      <div className="text-[11px] text-[var(--text-secondary)]">
+        {kin.tone.action} · {kin.tone.power} · {kin.tone.essence}
+      </div>
+
       {/* Info pills */}
-      <div className="flex items-center justify-center gap-1.5 flex-wrap">
+      <div className="flex items-center justify-center gap-1.5 flex-wrap pt-0.5">
         <Pill label={moonData.zodiacSign} colour="var(--seal-blue)" />
         <Pill label={moonData.phaseName} />
         <Pill label={`${moonData.illumination}%`} />

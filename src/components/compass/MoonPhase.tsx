@@ -86,14 +86,14 @@ export default function MoonPhase({ moonData, size = 86, sealGlyph }: MoonPhaseP
       {/* Rim */}
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(200,196,184,0.12)" strokeWidth={0.8} />
 
-      {/* Seal glyph overlay — opacity breathing only */}
+      {/* Seal glyph overlay — STATIC, no animation */}
       {sealGlyph && (
         <foreignObject
           x={cx - glyphSize / 2}
           y={cy - glyphSize / 2}
           width={glyphSize}
           height={glyphSize}
-          className="animate-breathe"
+          opacity={0.45}
         >
           <div className="flex items-center justify-center w-full h-full">
             {sealGlyph}
