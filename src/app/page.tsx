@@ -12,6 +12,7 @@ import MicroDashboard from '@/components/today/MicroDashboard';
 import MilestoneCard from '@/components/today/MilestoneCard';
 import BottomSheet from '@/components/layout/BottomSheet';
 import SealGlyph from '@/components/compass/SealGlyph';
+import SonicPrescription from '@/components/today/SonicPrescription';
 
 export default function TodayPage() {
   const [sheetContent, setSheetContent] = useState<{ title: string; body: React.ReactNode } | null>(null);
@@ -52,6 +53,7 @@ export default function TodayPage() {
               <OraclePill label="Occult" sealNumber={oracle.occult.number} seal={oracle.occult.name} colour={oracle.occult.colourHex} />
             </div>
           </div>
+          <SonicPrescription kin={kin} />
         </div>
       ),
     });

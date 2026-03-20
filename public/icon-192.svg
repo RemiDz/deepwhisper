@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <!-- Deep purple circle background -->
+  <circle cx="96" cy="96" r="96" fill="#1a1a2e"/>
+  <!-- White crescent moon: full circle minus an overlapping circle -->
+  <mask id="crescent">
+    <rect width="192" height="192" fill="black"/>
+    <circle cx="88" cy="72" r="38" fill="white"/>
+    <circle cx="108" cy="66" r="32" fill="black"/>
+  </mask>
+  <rect width="192" height="192" fill="white" mask="url(#crescent)"/>
+  <!-- DW text at bottom -->
+  <text x="96" y="148" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="rgba(255,255,255,0.7)" letter-spacing="3">DW</text>
+</svg>

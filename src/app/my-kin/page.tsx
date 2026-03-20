@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { getKinNumber, buildKin } from '@/lib/dreamspell/kin';
 import { getOracle } from '@/lib/dreamspell/oracle';
 import SealGlyph from '@/components/compass/SealGlyph';
+import { trackEvent } from '@/lib/analytics';
 
 const MONTHS = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -14,6 +15,7 @@ export default function MyKinPage() {
   const [showResult, setShowResult] = useState(false);
   const [isHunabKu, setIsHunabKu] = useState(false);
   const [useAlt, setUseAlt] = useState<'feb28' | 'mar1' | null>(null);
+  const [blueprintLoading, setBlueprintLoading] = useState(false);
 
   const kinNumber = useMemo(() => {
     const d = parseInt(day);
@@ -39,6 +41,7 @@ export default function MyKinPage() {
     setIsHunabKu(false);
     setUseAlt(null);
     setShowResult(true);
+    if (kinNumber && kinNumber > 0) trackEvent('kin-calculated', { kin: kinNumber });
   };
 
   const handleAlt = (choice: 'feb28' | 'mar1') => {
@@ -119,11 +122,28 @@ export default function MyKinPage() {
         </div>
 
         {/* Actions */}
-        <div className="mt-4 text-center">
+        <div className="flex gap-2 mt-4">
           <button
-            onClick={handleReset}
-            className="text-[12px] text-[var(--text-tertiary)] underline underline-offset-2"
+            onClick={async () => {
+              setBlueprintLoading(true);
+              trackEvent('blueprint-generated', { kin: kin.number });
+              try {
+                const { generateGalacticBlueprint } = await import('@/lib/pdf/galacticBlueprint');
+                const doc = await generateGalacticBlueprint(kin);
+                doc.save(`galactic-blueprint-kin-${kin.number}.pdf`);
+              } catch (e) { console.error('PDF error:', e); }
+              setBlueprintLoading(false);
+            }}
+            disabled={blueprintLoading}
+            className="flex-1 h-11 rounded-xl text-sm font-semibold"
+            style={{ background: 'rgba(234,179,8,0.12)', color: '#eab308' }}
           >
+            {blueprintLoading ? 'Generating...' : 'Galactic Blueprint'}
+          </button>
+        </div>
+        <div className="text-center text-[9px] text-[var(--text-dim)] mt-1">Preview — full premium version coming soon</div>
+        <div className="mt-3 text-center">
+          <button onClick={handleReset} className="text-[12px] text-[var(--text-tertiary)] underline underline-offset-2">
             Calculate another
           </button>
         </div>

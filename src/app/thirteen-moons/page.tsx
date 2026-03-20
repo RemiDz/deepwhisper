@@ -82,7 +82,7 @@ export default function ThirteenMoonsPage() {
       </div>
 
       {/* 28-day grid — fills width, 4px gaps */}
-      <div className="grid grid-cols-7 gap-[4px] flex-1 min-h-0 px-0">
+      <div className="grid grid-cols-7 gap-[4px] px-0 shrink-0">
         {days.map((dayInfo, i) => {
           const isToday = dayInfo.moonDay === todayMoonDay;
           const sealBg = dayInfo.kin ? dayInfo.kin.seal.bgHex : '#1a1a2a';
