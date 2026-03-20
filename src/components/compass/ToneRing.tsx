@@ -10,63 +10,59 @@ interface ToneRingProps {
 }
 
 /**
- * Tone notation:
- * 1-3: dot notation (1, 2, 3 dots)
- * 4-5: bar notation (1 bar, 1 bar + 1 dot for 5... actually 4=4 dots, 5=1 bar)
- * Per spec: tones 1-3 dots, 4-5 bars, 6-13 numbers.
+ * Mayan bar-dot notation for tones 1–13.
+ * Each dot = 1, each bar = 5. Dots above bars.
+ *
+ * 1=●  2=●●  3=●●●  4=●●●●  5=▬
+ * 6=● over ▬   7=●● over ▬   8=●●● over ▬   9=●●●● over ▬
+ * 10=▬▬  11=● over ▬▬  12=●● over ▬▬  13=●●● over ▬▬
  */
-function ToneSymbol({ tone, x, y, active }: { tone: number; x: number; y: number; active: boolean }) {
+function ToneGlyph({ tone, x, y, active }: { tone: number; x: number; y: number; active: boolean }) {
   const colour = active ? '#c084fc' : 'rgba(192,132,252,0.25)';
 
-  if (tone <= 3) {
-    // Dots
-    const dotR = 1.8;
-    const gap = 4.5;
-    const startY = y + ((tone - 1) * gap) / 2;
-    return (
-      <g>
-        {Array.from({ length: tone }, (_, i) => (
-          <circle key={i} cx={x} cy={startY - i * gap} r={dotR} fill={colour} />
-        ))}
-      </g>
-    );
-  }
+  const bars = Math.floor(tone / 5);  // 0,0,0,0,1,1,1,1,1,2,2,2,2
+  const dots = tone - bars * 5;        // 1,2,3,4,0,1,2,3,4,0,1,2,3
 
-  if (tone <= 5) {
-    // Bars (4 = 4 dots arranged 2x2, but spec says bar notation)
-    // 4 = 1 bar (representing 4 as "one bar minus one")... actually let's do:
-    // 4 = 4 dots, 5 = 1 bar per traditional Mayan notation
-    if (tone === 4) {
-      const dotR = 1.5;
-      return (
-        <g>
-          <circle cx={x - 2.5} cy={y - 2.5} r={dotR} fill={colour} />
-          <circle cx={x + 2.5} cy={y - 2.5} r={dotR} fill={colour} />
-          <circle cx={x - 2.5} cy={y + 2.5} r={dotR} fill={colour} />
-          <circle cx={x + 2.5} cy={y + 2.5} r={dotR} fill={colour} />
-        </g>
+  const dotR = 2;
+  const dotSpacing = 5;   // horizontal gap between dot centres
+  const barW = 14;
+  const barH = 3;
+  const barGap = 5;       // vertical gap between bar centres
+  const sectionGap = 4;   // vertical gap between dot row and first bar
+
+  // Calculate total height to centre the glyph vertically on (x, y)
+  const dotsRowH = dots > 0 ? dotR * 2 : 0;
+  const barsH = bars > 0 ? (bars - 1) * barGap + barH : 0;
+  const gapH = (dots > 0 && bars > 0) ? sectionGap : 0;
+  const totalH = dotsRowH + gapH + barsH;
+  const topY = y - totalH / 2;
+
+  const elements: React.ReactNode[] = [];
+
+  // Dots row (top) — horizontal, centred on x
+  if (dots > 0) {
+    const dotsWidth = (dots - 1) * dotSpacing;
+    const dotStartX = x - dotsWidth / 2;
+    const dotCY = topY + dotR;
+    for (let d = 0; d < dots; d++) {
+      elements.push(
+        <circle key={`d${d}`} cx={dotStartX + d * dotSpacing} cy={dotCY} r={dotR} fill={colour} />
       );
     }
-    // tone 5 = 1 bar
-    return (
-      <rect x={x - 5} y={y - 1} width={10} height={2} rx={1} fill={colour} />
-    );
   }
 
-  // Tones 6-13: display as numbers
-  return (
-    <text
-      x={x}
-      y={y + 1}
-      textAnchor="middle"
-      dominantBaseline="central"
-      fontSize={8}
-      fontWeight={active ? 700 : 400}
-      fill={colour}
-    >
-      {tone}
-    </text>
-  );
+  // Bars (bottom) — stacked vertically, centred on x
+  if (bars > 0) {
+    const firstBarY = topY + dotsRowH + gapH;
+    for (let b = 0; b < bars; b++) {
+      const barY = firstBarY + b * barGap;
+      elements.push(
+        <rect key={`b${b}`} x={x - barW / 2} y={barY} width={barW} height={barH} rx={1.5} fill={colour} />
+      );
+    }
+  }
+
+  return <g>{elements}</g>;
 }
 
 export default function ToneRing({ activeTone, cx, cy, radius }: ToneRingProps) {
@@ -79,20 +75,27 @@ export default function ToneRing({ activeTone, cx, cy, radius }: ToneRingProps) 
         const active = tone.number === activeTone;
 
         return (
-          <g key={tone.number}>
-            {/* Static glow behind active tone — no animation */}
+          <g key={tone.number} opacity={active ? 1 : 0.25}>
+            {/* Subtle glow behind active tone */}
             {active && (
               <circle
                 cx={tx}
                 cy={ty}
-                r={10}
+                r={12}
                 fill="rgba(192,132,252,0.15)"
+                filter="url(#tone-glow)"
               />
             )}
-            <ToneSymbol tone={tone.number} x={tx} y={ty} active={active} />
+            <ToneGlyph tone={tone.number} x={tx} y={ty} active={active} />
           </g>
         );
       })}
+      {/* SVG filter for active tone glow */}
+      <defs>
+        <filter id="tone-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
+        </filter>
+      </defs>
     </g>
   );
 }
