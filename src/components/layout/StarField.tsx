@@ -1,16 +1,18 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function StarField() {
-  const stars = useMemo(() => {
-    return Array.from({ length: 50 }, () => ({
+  const [stars, setStars] = useState<{ x: number; y: number; size: number; delay: number; duration: number }[]>([]);
+
+  useEffect(() => {
+    setStars(Array.from({ length: 50 }, () => ({
       x: Math.random() * 100,
       y: Math.random() * 100,
       size: Math.random() * 1.4 + 0.6,
       delay: Math.random() * 8,
       duration: Math.random() * 6 + 4,
-    }));
+    })));
   }, []);
 
   return (

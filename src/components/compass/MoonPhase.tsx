@@ -1,50 +1,38 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import type { MoonData } from '@/lib/dreamspell/types';
 
 interface MoonPhaseProps {
   moonData: MoonData;
   size?: number;
-  sealGlyph?: React.ReactNode;
+  zodiacSign?: string;
 }
 
-export default function MoonPhase({ moonData, size = 86, sealGlyph }: MoonPhaseProps) {
+const ZODIAC_SYMBOLS: Record<string, string> = {
+  'Aries': '♈', 'Taurus': '♉', 'Gemini': '♊', 'Cancer': '♋',
+  'Leo': '♌', 'Virgo': '♍', 'Libra': '♎', 'Scorpio': '♏',
+  'Sagittarius': '♐', 'Capricorn': '♑', 'Aquarius': '♒', 'Pisces': '♓',
+};
+
+const DEFAULT_PHASE = 0;
+
+export default function MoonPhase({ moonData, size = 86, zodiacSign }: MoonPhaseProps) {
+  const [phase, setPhase] = useState(DEFAULT_PHASE);
+
+  useEffect(() => {
+    setPhase(moonData.phase);
+  }, [moonData.phase]);
+
   const r = size / 2 - 2;
   const cx = size / 2;
   const cy = size / 2;
-  const phase = moonData.phase;
 
   // Build the lit portion path
   const litPath = buildLitPath(cx, cy, r, phase);
 
-  // Determine highlight position (on lit side)
-  const isWaxing = phase < 180;
-  const hlX = isWaxing ? cx + r * 0.22 : cx - r * 0.22;
-
-  // Maria (dark spots on lit side) — large subtle circles
-  const maria = [
-    { x: cx - r * 0.15, y: cy - r * 0.05, mr: r * 0.18 },
-    { x: cx + r * 0.22, y: cy + r * 0.25, mr: r * 0.22 },
-    { x: cx - r * 0.3, y: cy + r * 0.32, mr: r * 0.12 },
-  ];
-
-  // Craters — scattered across entire surface
-  const craters = [
-    { x: cx - r * 0.28, y: cy - r * 0.2, cr: r * 0.08 },
-    { x: cx + r * 0.15, y: cy + r * 0.35, cr: r * 0.12 },
-    { x: cx - r * 0.05, y: cy + r * 0.1, cr: r * 0.05 },
-    { x: cx + r * 0.35, y: cy - r * 0.25, cr: r * 0.07 },
-    { x: cx - r * 0.4, y: cy + r * 0.4, cr: r * 0.04 },
-    { x: cx + r * 0.08, y: cy - r * 0.45, cr: r * 0.05 },
-    { x: cx - r * 0.2, y: cy + r * 0.48, cr: r * 0.06 },
-    { x: cx + r * 0.42, y: cy + r * 0.08, cr: r * 0.035 },
-    { x: cx - r * 0.48, y: cy - r * 0.1, cr: r * 0.04 },
-    { x: cx + r * 0.3, y: cy - r * 0.4, cr: r * 0.05 },
-    { x: cx - r * 0.1, y: cy - r * 0.38, cr: r * 0.07 },
-    { x: cx + r * 0.05, y: cy + r * 0.45, cr: r * 0.04 },
-  ];
-
-  const glyphSize = Math.round(size * 0.5);
+  // Append text variation selector to force monochrome text rendering (no emoji background)
+  const zodiacSymbol = zodiacSign ? ((ZODIAC_SYMBOLS[zodiacSign] || '') + '\uFE0E') : '';
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
@@ -55,50 +43,34 @@ export default function MoonPhase({ moonData, size = 86, sealGlyph }: MoonPhaseP
       </defs>
 
       {/* Moon base — shadow side with slight earthshine luminosity */}
-      <circle cx={cx} cy={cy} r={r} fill="#0e0e1e" />
+      <circle cx={cx} cy={cy} r={r} fill="#080812" />
 
       {/* Lit portion */}
       {litPath && (
         <path d={litPath} fill="#e2ded4" clipPath="url(#moon-clip)" />
       )}
 
-      {/* Maria (dark patches on lit area) */}
-      {maria.map((m, i) => (
-        <circle key={`m${i}`} cx={m.x} cy={m.y} r={m.mr} fill="rgba(160,155,140,0.12)" clipPath="url(#moon-clip)" />
-      ))}
-
-      {/* Highlight on lit side */}
-      <ellipse cx={hlX} cy={cy - r * 0.15} rx={r * 0.25} ry={r * 0.4} fill="rgba(240,236,225,0.15)" clipPath="url(#moon-clip)" />
-
-      {/* Craters on lit side (darker) */}
-      {craters.map((c, i) => (
-        <circle key={`cl${i}`} cx={c.x} cy={c.y} r={c.cr} fill="rgba(160,155,140,0.1)" stroke="rgba(140,135,120,0.08)" strokeWidth={0.3} clipPath="url(#moon-clip)" />
-      ))}
-
-      {/* Craters on dark side (very subtle) */}
-      {craters.map((c, i) => (
-        <circle key={`cd${i}`} cx={c.x} cy={c.y} r={c.cr * 0.8} fill="rgba(180,175,160,0.04)" clipPath="url(#moon-clip)" />
-      ))}
-
-      {/* Earthshine — faint glow on shadow edge */}
-      <circle cx={cx} cy={cy} r={r - 0.5} fill="none" stroke="rgba(180,175,160,0.06)" strokeWidth={1} clipPath="url(#moon-clip)" />
-
       {/* Rim */}
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(200,196,184,0.12)" strokeWidth={0.8} />
 
-      {/* Seal glyph overlay — STATIC, no animation */}
-      {sealGlyph && (
-        <foreignObject
-          x={cx - glyphSize / 2}
-          y={cy - glyphSize / 2}
-          width={glyphSize}
-          height={glyphSize}
-          opacity={0.45}
+      {/* Zodiac symbol — light purple glyph with dark outline for contrast */}
+      {zodiacSymbol && (
+        <text
+          x={cx}
+          y={cy}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fontSize={30}
+          fontFamily="Georgia, 'Times New Roman', serif"
+          fill="#c084fc"
+          stroke="#080812"
+          strokeWidth={2}
+          paintOrder="stroke"
+          opacity={0.85}
+          pointerEvents="none"
         >
-          <div className="flex items-center justify-center w-full h-full">
-            {sealGlyph}
-          </div>
-        </foreignObject>
+          {zodiacSymbol}
+        </text>
       )}
     </svg>
   );

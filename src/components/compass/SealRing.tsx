@@ -82,6 +82,11 @@ export default function SealRing({ activeSealNumber, oracle, cx, cy, radius, onS
               y={sy - iconSz / 2}
               width={iconSz}
               height={iconSz}
+              pointerEvents="all"
+              style={{ filter: isActive
+                ? `drop-shadow(0 0 8px ${seal.colourHex}80) drop-shadow(0 2px 4px rgba(0,0,0,0.5))`
+                : 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'
+              }}
             />
           </g>
         );

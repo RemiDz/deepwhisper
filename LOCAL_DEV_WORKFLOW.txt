@@ -1,0 +1,103 @@
+====================================================
+  LOCAL DEV WORKFLOW — CHECK BEFORE YOU PUSH
+====================================================
+
+This saves you money by checking the app locally 
+before triggering a Vercel build.
+
+
+STEP 1: OPEN TERMINAL
+----------------------
+Open Command Prompt or PowerShell on your PC.
+
+
+STEP 2: GO TO YOUR PROJECT FOLDER
+-----------------------------------
+Type this and press Enter:
+
+  cd C:\Users\rdzingel\Documents\MY_APPS\HARMONIC_WAVES\deepwhisper.app
+
+
+STEP 3: START LOCAL SERVER
+---------------------------
+Type this and press Enter:
+
+  npm run dev
+
+Wait until you see something like:
+
+  ▲ Next.js 14.x
+  - Local: http://localhost:3000
+
+This means the app is running on your computer.
+
+
+STEP 4: CHECK IN YOUR BROWSER
+-------------------------------
+Open Chrome (or any browser) and go to:
+
+  http://localhost:3000
+
+This is your app running locally — no Vercel needed.
+Check everything looks correct. Tap around. Test all views.
+
+
+STEP 5: IF IT LOOKS GOOD — PUSH TO GIT
+-----------------------------------------
+Open a NEW terminal window (keep the dev server running)
+or press Ctrl+C in the terminal to stop the server first.
+
+Then run:
+
+  cd C:\Users\rdzingel\Documents\MY_APPS\HARMONIC_WAVES\deepwhisper.app
+  git add -A
+  git commit -m "describe what changed"
+  git push origin master:main
+
+This triggers the Vercel build and deploys to deepwhisper.app.
+
+
+STEP 6: IF IT LOOKS BAD — TELL CC TO FIX
+------------------------------------------
+Don't push. Go back to Claude Code and tell it what's wrong.
+CC will make more changes. The local server auto-refreshes,
+so just check localhost:3000 again after CC finishes.
+
+
+====================================================
+  TIP: ADD THIS TO EVERY CC PROMPT
+====================================================
+
+Paste this line at the END of every Claude Code prompt:
+
+  "After all changes, run npm run dev and WAIT for me
+   to visually confirm at localhost:3000 before 
+   committing or pushing to git."
+
+This stops CC from auto-pushing broken code.
+
+
+====================================================
+  QUICK REFERENCE
+====================================================
+
+  Start local server:    npm run dev
+  View in browser:       http://localhost:3000
+  Stop local server:     Ctrl+C in the terminal
+  Push to Vercel:        git add -A
+                         git commit -m "message"
+                         git push origin master:main
+
+
+====================================================
+  FOR OTHER APPS (same process, different folder)
+====================================================
+
+  Astrara:
+  cd C:\Users\rdzingel\Documents\MY_APPS\HARMONIC_WAVES\astrara.app
+  npm run dev
+  → http://localhost:3000
+
+  If port 3000 is already in use, Next.js will use 
+  3001 or 3002 — check the terminal output for the 
+  correct URL.

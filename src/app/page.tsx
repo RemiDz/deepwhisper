@@ -6,6 +6,7 @@ import { getOracle } from '@/lib/dreamspell/oracle';
 import { getMoonDate } from '@/lib/dreamspell/moons';
 import { getMoonData } from '@/lib/astronomy/moon';
 import { SEALS } from '@/lib/dreamspell/seals';
+import { getSealDescription, getToneDescription, getDeclaration } from '@/lib/galactic-content';
 import GalacticCompass from '@/components/compass/GalacticCompass';
 import KinStrip from '@/components/today/KinStrip';
 import MicroDashboard from '@/components/today/MicroDashboard';
@@ -26,6 +27,10 @@ export default function TodayPage() {
 
   const handleCentreTap = useCallback(() => {
     if (!kin || !oracle) return;
+    const declaration = getDeclaration(kin.number);
+    const sealDescKey = kin.seal.name === 'Worldbridger' ? 'World-Bridger' : kin.seal.name;
+    const sealDesc = getSealDescription(sealDescKey);
+    const toneDesc = getToneDescription(kin.tone.number);
     setSheetContent({
       title: kin.title,
       body: (
@@ -36,7 +41,14 @@ export default function TodayPage() {
             </div>
             <div className="text-2xl font-bold" style={{ color: kin.seal.colourHex }}>Kin {kin.number}</div>
             <div className="text-sm text-[var(--text-secondary)] mt-1">{kin.title}</div>
+            {kin.isGAP && <div className="text-xs text-[#a78bfa] mt-1">✦ Galactic Activation Portal</div>}
           </div>
+          {declaration && (
+            <div>
+              <div className="text-[10px] text-[var(--text-tertiary)] mb-2 tracking-wider">DECLARATION</div>
+              <div className="text-sm text-[var(--text-secondary)] leading-relaxed whitespace-pre-line">{declaration.declaration}</div>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-3 text-sm">
             <InfoRow label="Tone" value={`${kin.tone.name} — ${kin.tone.action}`} />
             <InfoRow label="Seal" value={`${kin.seal.name} — ${kin.seal.action}`} />
@@ -44,7 +56,20 @@ export default function TodayPage() {
             <InfoRow label="Essence" value={kin.seal.essence} />
             <InfoRow label="Direction" value={kin.seal.direction} />
             <InfoRow label="Wavespell" value={`${kin.wavespell}`} />
+            <InfoRow label="Castle" value={kin.castle.name} />
           </div>
+          {sealDesc && (
+            <div>
+              <div className="text-[10px] text-[var(--text-tertiary)] mb-2 tracking-wider">SEAL ESSENCE</div>
+              <div className="text-xs text-[var(--text-secondary)] leading-relaxed">{sealDesc}</div>
+            </div>
+          )}
+          {toneDesc && (
+            <div>
+              <div className="text-[10px] text-[var(--text-tertiary)] mb-2 tracking-wider">TONE ESSENCE</div>
+              <div className="text-xs text-[var(--text-secondary)] leading-relaxed">{toneDesc}</div>
+            </div>
+          )}
           <div className="pt-2 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
             <div className="text-[10px] text-[var(--text-tertiary)] mb-2 tracking-wider">FIFTH FORCE ORACLE</div>
             <div className="grid grid-cols-2 gap-2 text-xs">
@@ -62,28 +87,80 @@ export default function TodayPage() {
 
   const handleSealTap = useCallback((sealNumber: number) => {
     const seal = SEALS[sealNumber];
+    const descKey = seal.name === 'Worldbridger' ? 'World-Bridger' : seal.name;
+    const description = getSealDescription(descKey);
+    const DIRECTION_ELEMENTS: Record<string, string> = { East: 'Fire', North: 'Air', West: 'Water', South: 'Earth' };
+    const element = DIRECTION_ELEMENTS[seal.direction] || '';
+    const analogSeal = SEALS[(17 - seal.number + 20) % 20];
+    const antipodeSeal = SEALS[(seal.number + 10) % 20];
+    const occultSeal = SEALS[(19 - seal.number + 20) % 20];
+    const isActive = kin ? sealNumber === kin.seal.number : false;
+    // The 13 Kins for this seal: sealIndex + 1, sealIndex + 21, sealIndex + 41, ...
+    const sealKins = Array.from({ length: 13 }, (_, i) => seal.number + i * 20 + 1);
     setSheetContent({
-      title: seal.name,
+      title: `Solar Seal: ${seal.colour} ${seal.name}`,
       body: (
         <div className="space-y-3">
           <div className="text-center">
             <div className="flex justify-center mb-2">
               <SealGlyph sealNumber={seal.number} size={48} showBg />
             </div>
-            <div className="text-xl font-bold" style={{ color: seal.colourHex }}>{seal.name}</div>
+            <div className="text-xl font-bold" style={{ color: seal.colourHex }}>{seal.colour} {seal.name}</div>
             <div className="text-[11px] text-[var(--text-tertiary)]">Seal {seal.number + 1} of 20</div>
+            <div className="text-[10px] text-[var(--text-tertiary)] mt-1">
+              This seal appears in 13 Kins ({sealKins.slice(0, 3).map(k => `Kin ${k}`).join(', ')}... etc) — each paired with a different tone.
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <InfoRow label="Colour" value={seal.colour} />
-            <InfoRow label="Direction" value={seal.direction} />
-            <InfoRow label="Power" value={seal.power} />
-            <InfoRow label="Action" value={seal.action} />
-            <InfoRow label="Essence" value={seal.essence} />
+          {isActive && kin && (
+            <div className="px-3 py-2.5 rounded-lg" style={{ background: 'rgba(192,132,252,0.08)', border: '0.5px solid rgba(192,132,252,0.15)' }}>
+              <div className="text-[10px] text-[var(--text-tertiary)] mb-1.5 tracking-wider">TODAY&apos;S KIN</div>
+              <div className="text-sm font-medium" style={{ color: kin.seal.colourHex }}>Kin {kin.number} — {kin.title}</div>
+              <div className="flex items-center gap-2 mt-1.5">
+                <ToneBarDotSheet tone={kin.tone.number} />
+                <div>
+                  <div className="text-sm" style={{ color: '#c084fc' }}>Tone {kin.tone.number} · {kin.tone.name}</div>
+                  <div className="text-[11px] text-[var(--text-secondary)]">{kin.tone.action} · {kin.tone.power} · {kin.tone.essence}</div>
+                </div>
+              </div>
+            </div>
+          )}
+          {description && (
+            <div>
+              <div className="text-[10px] text-[var(--text-tertiary)] mb-2 tracking-wider">SEAL ESSENCE</div>
+              <div className="text-xs text-[var(--text-secondary)] leading-relaxed">{description}</div>
+            </div>
+          )}
+          <div>
+            <div className="text-[10px] text-[var(--text-tertiary)] mb-2 tracking-wider">ATTRIBUTES</div>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <InfoRow label="Colour" value={seal.colour} />
+              <InfoRow label="Direction" value={seal.direction} />
+              <InfoRow label="Element" value={element} />
+              <InfoRow label="Action" value={seal.action} />
+              <InfoRow label="Power" value={seal.power} />
+              <InfoRow label="Essence" value={seal.essence} />
+            </div>
           </div>
+          <div className="pt-2 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+            <div className="text-[10px] text-[var(--text-tertiary)] mb-2 tracking-wider">ORACLE FAMILY</div>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <OraclePill label="Analog" sealNumber={analogSeal.number} seal={analogSeal.name} colour={analogSeal.colourHex} />
+              <OraclePill label="Antipode" sealNumber={antipodeSeal.number} seal={antipodeSeal.name} colour={antipodeSeal.colourHex} />
+              <OraclePill label="Occult" sealNumber={occultSeal.number} seal={occultSeal.name} colour={occultSeal.colourHex} />
+            </div>
+            <div className="text-[10px] text-[var(--text-tertiary)] mt-2 italic">Guide varies by tone</div>
+          </div>
+          {!isActive && (
+            <div className="text-center pt-1">
+              <a href="/my-kin" className="text-[11px] text-[#a78bfa] underline underline-offset-2">
+                Calculate your personal {seal.name} Kin on the My Kin page
+              </a>
+            </div>
+          )}
         </div>
       ),
     });
-  }, []);
+  }, [kin]);
 
   if (!kin || !oracle) {
     return (
@@ -97,41 +174,51 @@ export default function TodayPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto px-3 pt-2 pb-20 overflow-y-auto h-full" style={{ WebkitOverflowScrolling: 'touch' }}>
-      {/* Header — full width, no clipping */}
-      <header className="text-center w-full">
-        <h1 className="text-[10px] font-semibold tracking-[0.2em] text-[var(--text-tertiary)] uppercase">
-          Deep Whisper
-        </h1>
-        {moonDate.moon && (
-          <p className="text-[11px] text-[var(--text-secondary)]">
-            {moonDate.moon.name} · Day {moonDate.moonDay}
-          </p>
-        )}
-        {moonDate.isDayOutOfTime && (
-          <p className="text-[11px] text-[var(--purple)]">Day Out of Time</p>
-        )}
-      </header>
+    <>
+      <div className="max-w-md mx-auto px-3 pt-2 pb-20 overflow-y-auto h-full" style={{ WebkitOverflowScrolling: 'touch' }}>
+        {/* Header — full width, no clipping */}
+        <header className="text-center w-full">
+          <h1 className="text-[10px] font-semibold tracking-[0.2em] text-[var(--text-tertiary)] uppercase">
+            Deep Whisper
+          </h1>
+          {moonDate.moon && (
+            <p className="text-[11px] text-[var(--text-secondary)]">
+              {moonDate.moon.name} · Day {moonDate.moonDay}
+            </p>
+          )}
+          {moonDate.isDayOutOfTime && (
+            <p className="text-[11px] text-[var(--purple)]">Day Out of Time</p>
+          )}
+        </header>
 
-      {/* Galactic Compass — centred */}
-      <div className="flex items-center justify-center py-2">
-        <GalacticCompass
-          kin={kin}
-          oracle={oracle}
-          moonData={moonData}
-          onCentreTap={handleCentreTap}
-          onSealTap={handleSealTap}
-        />
+        {/* Galactic Compass — centred */}
+        <div className="flex items-center justify-center py-2">
+          <GalacticCompass
+            kin={kin}
+            oracle={oracle}
+            moonData={moonData}
+            onCentreTap={handleCentreTap}
+            onSealTap={handleSealTap}
+          />
+        </div>
+
+        {/* Info below compass */}
+        <div className="space-y-2">
+          <KinStrip kin={kin} moonData={moonData} />
+          <DeclarationCard kinNumber={kin.number} sealColourHex={kin.seal.colourHex} />
+          <MicroDashboard kin={kin} />
+          <MilestoneCard kin={kin} />
+        </div>
       </div>
 
-      {/* Info below compass */}
-      <div className="space-y-2">
-        <KinStrip kin={kin} moonData={moonData} />
-        <DeclarationCard kinNumber={kin.number} sealColourHex={kin.seal.colourHex} />
-        <MicroDashboard kin={kin} />
-        <MilestoneCard kin={kin} />
-      </div>
-    </div>
+      <BottomSheet
+        open={!!sheetContent}
+        onClose={() => setSheetContent(null)}
+        title={sheetContent?.title}
+      >
+        {sheetContent?.body}
+      </BottomSheet>
+    </>
   );
 }
 
@@ -141,6 +228,46 @@ function InfoRow({ label, value }: { label: string; value: string }) {
       <div className="text-[10px] text-[var(--text-tertiary)]">{label}</div>
       <div className="text-[var(--text-primary)]">{value}</div>
     </div>
+  );
+}
+
+function ToneBarDotSheet({ tone }: { tone: number }) {
+  const bars = Math.floor(tone / 5);
+  const dots = tone % 5;
+  const colour = '#c084fc';
+  const dotR = 2.5;
+  const dotSpacing = 6;
+  const barW = 14;
+  const barH = 3.5;
+  const barGap = 5;
+  const sectionGap = 4;
+  const dotsRowH = dots > 0 ? dotR * 2 : 0;
+  const barsH = bars > 0 ? (bars - 1) * barGap + barH : 0;
+  const gapH = dots > 0 && bars > 0 ? sectionGap : 0;
+  const totalH = dotsRowH + gapH + barsH;
+  const dotsWidth = dots > 0 ? (dots - 1) * dotSpacing + dotR * 2 : 0;
+  const svgW = Math.max(barW, dotsWidth) + 2;
+  const svgH = Math.max(totalH, 4) + 2;
+  const midX = svgW / 2;
+  const elements: React.ReactNode[] = [];
+  if (dots > 0) {
+    const rowW = (dots - 1) * dotSpacing;
+    const startX = midX - rowW / 2;
+    const dotCY = 1 + dotR;
+    for (let d = 0; d < dots; d++) {
+      elements.push(<circle key={`d${d}`} cx={startX + d * dotSpacing} cy={dotCY} r={dotR} fill={colour} />);
+    }
+  }
+  if (bars > 0) {
+    const firstBarY = 1 + dotsRowH + gapH;
+    for (let b = 0; b < bars; b++) {
+      elements.push(<rect key={`b${b}`} x={midX - barW / 2} y={firstBarY + b * barGap} width={barW} height={barH} rx={1.5} fill={colour} />);
+    }
+  }
+  return (
+    <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`} className="inline-block shrink-0">
+      {elements}
+    </svg>
   );
 }
 
