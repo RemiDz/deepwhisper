@@ -5,6 +5,8 @@ import { getKinNumber, buildKin } from '@/lib/dreamspell/kin';
 import { getOracle } from '@/lib/dreamspell/oracle';
 import SealGlyph from '@/components/compass/SealGlyph';
 import { trackEvent } from '@/lib/analytics';
+import SoulEssence from '@/components/today/SoulEssence';
+import { DeclarationFull } from '@/components/today/DeclarationCard';
 
 const MONTHS = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -119,6 +121,16 @@ export default function MyKinPage() {
 
           {/* Watermark */}
           <div className="text-center text-[8px] text-[var(--text-dim)] pt-1">deepwhisper.app</div>
+        </div>
+
+        {/* Soul Essence */}
+        <div className="mt-3">
+          <SoulEssence sealName={kin.seal.name} sealColourHex={kin.seal.colourHex} />
+        </div>
+
+        {/* Personal Declaration */}
+        <div className="mt-3">
+          <DeclarationFull kinNumber={kin.number} sealColourHex={kin.seal.colourHex} />
         </div>
 
         {/* Actions */}

@@ -6,6 +6,7 @@ import { getKinNumber, buildKin } from '@/lib/dreamspell/kin';
 import type { Moon13, Kin } from '@/lib/dreamspell/types';
 import SealGlyph from '@/components/compass/SealGlyph';
 import BottomSheet from '@/components/layout/BottomSheet';
+import { getDeclaration } from '@/lib/galactic-content';
 
 export default function ThirteenMoonsPage() {
   const today = useMemo(() => new Date(), []);
@@ -132,16 +133,7 @@ export default function ThirteenMoonsPage() {
         title={selectedDayKin?.title}
       >
         {selectedDayKin && (
-          <div className="space-y-3 text-center">
-            <SealGlyph sealNumber={selectedDayKin.seal.number} size={48} showBg />
-            <div className="text-xl font-bold" style={{ color: selectedDayKin.seal.colourHex }}>
-              Kin {selectedDayKin.number}
-            </div>
-            <div className="text-sm text-[var(--text-secondary)]">{selectedDayKin.title}</div>
-            <div className="text-xs text-[var(--text-tertiary)]">
-              {selectedDayKin.tone.name} — {selectedDayKin.tone.action} · {selectedDayKin.tone.power} · {selectedDayKin.tone.essence}
-            </div>
-          </div>
+          <DayKinDetail kin={selectedDayKin} />
         )}
       </BottomSheet>
     </div>
@@ -179,6 +171,37 @@ function generateMoonDays(moon: Moon13, moonYearStart: number): DayInfo[] {
 function formatGregorianRange(moon: Moon13): string {
   const months = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   return `${months[moon.gregorianStart.month]} ${moon.gregorianStart.day} — ${months[moon.gregorianEnd.month]} ${moon.gregorianEnd.day}`;
+}
+
+function DayKinDetail({ kin }: { kin: Kin }) {
+  const decl = getDeclaration(kin.number);
+  const preview = decl?.declaration.split('\n').filter(l => l.trim()).slice(0, 2).join(' · ') ?? '';
+
+  return (
+    <div className="space-y-3 text-center">
+      <div className="flex justify-center">
+        <SealGlyph sealNumber={kin.seal.number} size={48} showBg />
+      </div>
+      <div>
+        <div className="text-[11px] text-[var(--text-tertiary)]">
+          Kin {kin.number} ·{' '}
+          <span className="inline-block w-2 h-2 rounded-full align-middle" style={{ background: kin.seal.colourHex }} />
+        </div>
+        <div className="text-lg font-bold" style={{ color: kin.seal.colourHex }}>
+          {kin.title}
+        </div>
+      </div>
+      <div className="text-xs text-[var(--text-tertiary)]">
+        {kin.tone.name} — {kin.tone.action} · {kin.tone.power} · {kin.tone.essence}
+      </div>
+      {preview && (
+        <div className="text-left pt-2 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+          <div className="text-[9px] font-semibold tracking-[0.1em] text-[var(--text-tertiary)] uppercase mb-1">Declaration</div>
+          <p className="text-[12px] leading-[1.5] text-[#b8b5ad]">{preview}</p>
+        </div>
+      )}
+    </div>
+  );
 }
 
 function Chevron({ dir }: { dir: 'left' | 'right' }) {

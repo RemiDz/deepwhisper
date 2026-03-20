@@ -6,11 +6,13 @@ import { TONES } from '@/lib/dreamspell/tones';
 import { getWavespellNumber, getWavespellSeal, getWavespellPosition } from '@/lib/dreamspell/wavespell';
 import { getCastleForKin } from '@/lib/dreamspell/castles';
 import SealGlyph from '@/components/compass/SealGlyph';
+import { getToneDescription } from '@/lib/galactic-content';
 
 export default function WavespellPage() {
   const today = useMemo(() => new Date(), []);
   const todayKin = useMemo(() => getKinForDateFull(today), [today]);
-  const [wsOffset, setWsOffset] = useState(0); // 0 = current wavespell
+  const [wsOffset, setWsOffset] = useState(0);
+  const [expandedTone, setExpandedTone] = useState<number | null>(null);
 
   const baseKin = todayKin ?? buildKin(1);
   const baseWs = getWavespellNumber(baseKin.number);
@@ -134,9 +136,9 @@ export default function WavespellPage() {
                 )}
               </div>
 
-              {/* Card */}
+              {/* Card — tappable to expand tone description */}
               <div
-                className={`flex items-center gap-2.5 flex-1 px-3 py-2 rounded-xl min-w-0 ${isToday ? '' : ''}`}
+                className="flex-1 min-w-0 rounded-xl cursor-pointer overflow-hidden transition-all duration-200"
                 style={{
                   background: isToday
                     ? 'rgba(192,132,252,0.06)'
@@ -144,39 +146,57 @@ export default function WavespellPage() {
                   border: isToday
                     ? '1px solid rgba(192,132,252,0.25)'
                     : '0.5px solid rgba(255,255,255,0.04)',
+                  borderLeft: isToday ? `3px solid var(--purple)` : undefined,
                   opacity: isFuture ? 0.6 : isPast ? 0.85 : 1,
                 }}
+                onClick={() => setExpandedTone(expandedTone === tone.number ? null : tone.number)}
               >
-                <SealGlyph sealNumber={kin.seal.number} size={36} showBg />
+                <div className="flex items-center gap-2.5 px-3 py-2">
+                  <SealGlyph sealNumber={kin.seal.number} size={36} showBg />
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span
-                      className={`text-[13px] truncate ${isToday ? 'font-bold' : 'font-medium'}`}
-                      style={{ color: kin.seal.colourHex }}
-                    >
-                      {kin.title}
-                    </span>
-                    {kin.isGAP && (
-                      <span className="text-[7px] px-1 py-[1px] rounded bg-[rgba(234,179,8,0.12)] text-[var(--seal-yellow)] shrink-0 font-semibold">
-                        GAP
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={`text-[13px] truncate ${isToday ? 'font-bold' : 'font-medium'}`}
+                        style={{ color: kin.seal.colourHex }}
+                      >
+                        {kin.title}
                       </span>
-                    )}
+                      {kin.isGAP && (
+                        <span className="text-[7px] px-1 py-[1px] rounded bg-[rgba(234,179,8,0.12)] text-[var(--seal-yellow)] shrink-0 font-semibold">
+                          GAP
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-[10px] text-[var(--text-tertiary)]">
+                      {tone.action} · {tone.power} · {tone.essence}
+                    </div>
                   </div>
-                  <div className="text-[10px] text-[var(--text-tertiary)]">
-                    {tone.action} · {tone.power} · {tone.essence}
-                  </div>
+
+                  <span
+                    className="text-[10px] px-1.5 py-0.5 rounded-md tabular-nums shrink-0"
+                    style={{
+                      background: 'rgba(255,255,255,0.03)',
+                      color: 'var(--text-tertiary)',
+                    }}
+                  >
+                    {kin.number}
+                  </span>
                 </div>
 
-                <span
-                  className="text-[10px] px-1.5 py-0.5 rounded-md tabular-nums shrink-0"
-                  style={{
-                    background: 'rgba(255,255,255,0.03)',
-                    color: 'var(--text-tertiary)',
-                  }}
-                >
-                  {kin.number}
-                </span>
+                {/* Expanded tone description */}
+                {expandedTone === tone.number && (
+                  <div className="px-3 pb-3">
+                    <div className="pt-2 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+                      <div className="text-[10px] font-semibold text-[var(--purple)] mb-1">
+                        {tone.number} — {tone.name}
+                      </div>
+                      <p className="text-[12px] leading-[1.6]" style={{ color: '#b8b5ad' }}>
+                        {getToneDescription(tone.number).slice(0, 300).replace(/\s\S*$/, '')}...
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           );
