@@ -14,8 +14,16 @@ export default function TabBar() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t backdrop-blur-xl bg-[#080812]/80"
-         style={{ borderColor: 'var(--border-subtle)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-50"
+      style={{
+        background: 'rgba(8,8,18,0.95)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderTop: '0.5px solid rgba(255,255,255,0.06)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+      }}
+    >
       <div className="flex h-[72px] items-center justify-around max-w-md mx-auto">
         {TABS.map(({ href, label, icon: Icon }) => {
           const active = pathname === href;
@@ -23,12 +31,12 @@ export default function TabBar() {
             <Link
               key={href}
               href={href}
-              className={`flex flex-col items-center gap-1 px-3 py-2 transition-colors ${
+              className={`tap-feedback flex flex-col items-center gap-1 px-4 py-2 transition-colors ${
                 active ? 'text-[var(--purple)]' : 'text-[var(--text-tertiary)]'
               }`}
             >
-              <Icon className="w-6 h-6" />
-              <span className="text-[10px] font-medium">{label}</span>
+              <Icon className="w-[22px] h-[22px]" />
+              <span className="text-[9px] font-medium">{label}</span>
             </Link>
           );
         })}

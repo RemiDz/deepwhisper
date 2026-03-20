@@ -2,31 +2,23 @@
 
 import { useMemo } from 'react';
 
-interface Star {
-  x: number;
-  y: number;
-  size: number;
-  delay: number;
-  duration: number;
-}
-
-export default function StarField({ count = 60 }: { count?: number }) {
-  const stars = useMemo<Star[]>(() => {
-    return Array.from({ length: count }, () => ({
+export default function StarField() {
+  const stars = useMemo(() => {
+    return Array.from({ length: 50 }, () => ({
       x: Math.random() * 100,
       y: Math.random() * 100,
-      size: Math.random() * 1.5 + 0.5,
-      delay: Math.random() * 5,
-      duration: Math.random() * 4 + 3,
+      size: Math.random() * 1.4 + 0.6,
+      delay: Math.random() * 8,
+      duration: Math.random() * 6 + 4,
     }));
-  }, [count]);
+  }, []);
 
   return (
-    <div className="fixed inset-0 pointer-events-none" aria-hidden>
+    <div className="fixed inset-0 pointer-events-none z-0" aria-hidden>
       {stars.map((star, i) => (
         <div
           key={i}
-          className="absolute rounded-full bg-white/60"
+          className="absolute rounded-full bg-white"
           style={{
             left: `${star.x}%`,
             top: `${star.y}%`,

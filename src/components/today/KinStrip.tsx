@@ -10,41 +10,47 @@ interface KinStripProps {
 
 export default function KinStrip({ kin, moonData }: KinStripProps) {
   return (
-    <div className="text-center space-y-2">
-      {/* Kin number + title */}
-      <div>
-        <div className="flex items-center justify-center gap-2">
-          <span
-            className="text-3xl font-bold tabular-nums"
-            style={{ color: kin.seal.colourHex }}
-          >
-            {kin.number}
-          </span>
-          {kin.isGAP && (
-            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-[var(--purple-dim)] text-[var(--purple)]">
-              GAP
-            </span>
-          )}
+    <div className="text-center space-y-1.5">
+      {/* Kin number + title in a horizontal row */}
+      <div className="flex items-baseline justify-center gap-2.5">
+        <span className="text-[34px] font-bold tabular-nums leading-none text-[var(--text-primary)]">
+          {kin.number}
+        </span>
+        <div className="text-left">
+          <div className="text-[15px] font-medium leading-tight" style={{ color: kin.seal.colourHex }}>
+            {kin.title}
+          </div>
+          <div className="text-[11px] text-[var(--text-secondary)] leading-tight">
+            {kin.tone.action} · {kin.tone.power} · {kin.tone.essence}
+          </div>
         </div>
-        <h2 className="text-lg font-medium mt-0.5" style={{ color: kin.seal.colourHex }}>
-          {kin.title}
-        </h2>
+        {kin.isGAP && (
+          <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-[var(--purple-dim)] text-[var(--purple)] self-center">
+            GAP
+          </span>
+        )}
       </div>
 
       {/* Info pills */}
-      <div className="flex items-center justify-center gap-2 flex-wrap">
+      <div className="flex items-center justify-center gap-1.5 flex-wrap">
+        <Pill label={moonData.zodiacSign} colour="var(--seal-blue)" />
         <Pill label={moonData.phaseName} />
-        <Pill label={`${moonData.zodiacSign} ${moonData.zodiacDegree}°`} />
-        <Pill label={`${moonData.illumination}% lit`} />
+        <Pill label={`${moonData.illumination}%`} />
       </div>
     </div>
   );
 }
 
-function Pill({ label }: { label: string }) {
+function Pill({ label, colour }: { label: string; colour?: string }) {
   return (
-    <span className="text-[10px] px-2 py-0.5 rounded-full border text-[var(--text-secondary)]"
-          style={{ borderColor: 'var(--border-subtle)', background: 'var(--bg-card)' }}>
+    <span
+      className="text-[10px] px-2.5 py-[3px] rounded-[10px]"
+      style={{
+        background: 'rgba(255,255,255,0.03)',
+        border: '0.5px solid rgba(255,255,255,0.06)',
+        color: colour ?? 'var(--text-secondary)',
+      }}
+    >
       {label}
     </span>
   );

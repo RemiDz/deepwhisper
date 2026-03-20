@@ -16,38 +16,50 @@ interface GalacticCompassProps {
 }
 
 export default function GalacticCompass({ kin, oracle, moonData, onCentreTap, onSealTap }: GalacticCompassProps) {
-  const size = 320;
+  const size = 310;
   const cx = size / 2;
   const cy = size / 2;
-  const sealRadius = size / 2 - 18;
-  const toneRadius = size / 2 - 48;
-  const moonSize = 68;
+
+  // Ring radii (inside → out)
+  const moonSize = 76;
+  const moonRadius = moonSize / 2 - 2; // edge of moon for oracle lines
+  const toneRadius = 100;
+  const sealRadius = 132;
+  const sealSquareSize = 29;
 
   const sealOverlay = (
     <img
       src={kin.seal.iconPath}
       alt={kin.seal.name}
-      width={32}
-      height={32}
-      style={{ borderRadius: 4, opacity: 0.45, mixBlendMode: 'screen' }}
+      width={34}
+      height={34}
+      style={{ borderRadius: 4, mixBlendMode: 'screen' as const, display: 'block' }}
       draggable={false}
     />
   );
 
   return (
-    <div className="relative flex items-center justify-center">
+    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
       <svg
         width={size}
         height={size}
         viewBox={`0 0 ${size} ${size}`}
         className="max-w-full"
       >
-        {/* Subtle background rings */}
-        <circle cx={cx} cy={cy} r={sealRadius + 4} fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth={1} />
-        <circle cx={cx} cy={cy} r={toneRadius - 4} fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth={1} />
+        {/* Structural ring guides (decorative, barely visible) */}
+        <circle cx={cx} cy={cy} r={sealRadius + sealSquareSize / 2 + 3} fill="none" stroke="rgba(255,255,255,0.035)" strokeWidth={0.5} />
+        <circle cx={cx} cy={cy} r={toneRadius + 14} fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth={0.5} />
+        <circle cx={cx} cy={cy} r={toneRadius - 14} fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth={0.5} />
 
-        {/* Oracle connection lines */}
-        <OracleLines oracle={oracle} cx={cx} cy={cy} sealRingRadius={sealRadius} />
+        {/* Oracle connection lines (behind everything) */}
+        <OracleLines
+          oracle={oracle}
+          cx={cx}
+          cy={cy}
+          moonRadius={moonRadius}
+          sealRingRadius={sealRadius}
+          sealSquareSize={sealSquareSize}
+        />
 
         {/* Seal ring (outer) */}
         <SealRing
@@ -68,7 +80,7 @@ export default function GalacticCompass({ kin, oracle, moonData, onCentreTap, on
         />
       </svg>
 
-      {/* Overlay centred moon using absolute positioning */}
+      {/* Centre moon (HTML-positioned for clean img rendering) */}
       <div
         className="absolute cursor-pointer"
         style={{

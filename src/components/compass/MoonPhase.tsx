@@ -8,30 +8,15 @@ interface MoonPhaseProps {
   sealGlyph?: React.ReactNode;
 }
 
-export default function MoonPhase({ moonData, size = 100, sealGlyph }: MoonPhaseProps) {
+export default function MoonPhase({ moonData, size = 76, sealGlyph }: MoonPhaseProps) {
   const r = size / 2 - 2;
   const cx = size / 2;
   const cy = size / 2;
-
-  // Calculate terminator for moon phase rendering
-  // phase: 0 = new, 90 = first quarter, 180 = full, 270 = last quarter
   const phase = moonData.phase;
-  const illuminationFraction = moonData.illumination / 100;
-
-  // Determine which side is lit
   const isWaxing = phase < 180;
-
-  // Calculate the terminator ellipse
-  // The terminator curve is an ellipse whose x-radius varies with phase
   const phaseAngle = (phase % 180) * (Math.PI / 180);
   const terminatorX = Math.cos(phaseAngle) * r;
-
-  // Build the moon path
-  // Light side is a semicircle, terminator is an ellipse
-  const lightSide = isWaxing ? 'right' : 'left';
-
-  // Semicircle arc for the lit edge
-  const semiArcFlag = lightSide === 'right' ? '0' : '1';
+  const semiArcFlag = isWaxing ? '0' : '1';
 
   const moonPath = `
     M ${cx} ${cy - r}
@@ -40,48 +25,55 @@ export default function MoonPhase({ moonData, size = 100, sealGlyph }: MoonPhase
     Z
   `;
 
-  // Crater positions (subtle texture)
+  // Crater positions for texture
   const craters = [
-    { cx: cx - r * 0.3, cy: cy - r * 0.2, r: r * 0.12 },
-    { cx: cx + r * 0.15, cy: cy + r * 0.35, r: r * 0.18 },
-    { cx: cx - r * 0.1, cy: cy + r * 0.15, r: r * 0.08 },
-    { cx: cx + r * 0.35, cy: cy - r * 0.3, r: r * 0.1 },
-    { cx: cx - r * 0.4, cy: cy + r * 0.4, r: r * 0.06 },
+    { x: cx - r * 0.28, y: cy - r * 0.18, cr: r * 0.11 },
+    { x: cx + r * 0.18, y: cy + r * 0.32, cr: r * 0.16 },
+    { x: cx - r * 0.08, y: cy + r * 0.12, cr: r * 0.07 },
+    { x: cx + r * 0.32, y: cy - r * 0.28, cr: r * 0.09 },
+    { x: cx - r * 0.38, y: cy + r * 0.38, cr: r * 0.05 },
+    { x: cx + r * 0.05, y: cy - r * 0.42, cr: r * 0.06 },
+    { x: cx - r * 0.2, y: cy + r * 0.45, cr: r * 0.08 },
+    { x: cx + r * 0.4, y: cy + r * 0.1, cr: r * 0.04 },
   ];
+
+  // Highlight ellipse position (on lit side)
+  const highlightX = isWaxing ? cx + r * 0.2 : cx - r * 0.2;
+
+  const glyphSize = Math.round(size * 0.44);
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      {/* Moon base (dark) */}
-      <circle cx={cx} cy={cy} r={r} fill="#1a1a2e" />
+      {/* Moon base (shadow) */}
+      <circle cx={cx} cy={cy} r={r} fill="#14142a" />
 
       {/* Lit portion */}
-      <path d={moonPath} fill="#d4d0c8" opacity={0.9} />
+      <path d={moonPath} fill="#dedad0" opacity={0.92} />
+
+      {/* Subtle highlight on lit side */}
+      <ellipse cx={highlightX} cy={cy - r * 0.1} rx={r * 0.3} ry={r * 0.5} fill="#e8e4d8" opacity={0.1} />
 
       {/* Crater texture */}
-      {craters.map((crater, i) => (
-        <circle
-          key={i}
-          cx={crater.cx}
-          cy={crater.cy}
-          r={crater.r}
-          fill="none"
-          stroke="rgba(0,0,0,0.15)"
-          strokeWidth={0.5}
-        />
+      {craters.map((c, i) => (
+        <circle key={i} cx={c.x} cy={c.y} r={c.cr} fill="none" stroke="rgba(0,0,0,0.04)" strokeWidth={0.4} />
       ))}
 
       {/* Rim */}
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={1} />
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(200,196,184,0.1)" strokeWidth={0.7} />
 
-      {/* Seal glyph overlay in centre */}
+      {/* Seal overlay — opacity pulse only, NO position animation */}
       {sealGlyph && (
-        <g opacity={0.4} className="animate-pulse-gentle">
-          <foreignObject x={cx - 16} y={cy - 16} width={32} height={32}>
-            <div className="flex items-center justify-center w-full h-full">
-              {sealGlyph}
-            </div>
-          </foreignObject>
-        </g>
+        <foreignObject
+          x={cx - glyphSize / 2}
+          y={cy - glyphSize / 2}
+          width={glyphSize}
+          height={glyphSize}
+          className="animate-breathe"
+        >
+          <div className="flex items-center justify-center w-full h-full">
+            {sealGlyph}
+          </div>
+        </foreignObject>
       )}
     </svg>
   );

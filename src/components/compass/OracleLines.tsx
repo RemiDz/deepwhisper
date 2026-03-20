@@ -6,48 +6,59 @@ interface OracleLinesProps {
   oracle: Oracle;
   cx: number;
   cy: number;
+  moonRadius: number;
   sealRingRadius: number;
+  sealSquareSize: number;
 }
 
-const ORACLE_COLOURS = {
-  guide: 'var(--purple)',
-  analog: 'var(--seal-white)',
-  antipode: 'var(--seal-blue)',
-  occult: 'var(--seal-yellow)',
+const ORACLE_STYLES = {
+  guide:    { colour: '#eab308', width: 0.8 },
+  analog:   { colour: '#e8e6df', width: 0.7 },
+  antipode: { colour: '#3b82f6', width: 0.7 },
+  occult:   { colour: '#a855f7', width: 0.7 },
 };
 
-export default function OracleLines({ oracle, cx, cy, sealRingRadius }: OracleLinesProps) {
-  const getPos = (sealNumber: number) => {
+export default function OracleLines({ oracle, cx, cy, moonRadius, sealRingRadius, sealSquareSize }: OracleLinesProps) {
+  const halfSq = sealSquareSize / 2;
+
+  const getEndpoints = (sealNumber: number) => {
     const angle = ((sealNumber / 20) * 360 - 90) * (Math.PI / 180);
-    return {
-      x: cx + Math.cos(angle) * sealRingRadius,
-      y: cy + Math.sin(angle) * sealRingRadius,
-    };
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    // Start from moon edge
+    const x1 = cx + cos * moonRadius;
+    const y1 = cy + sin * moonRadius;
+    // End at seal square edge
+    const x2 = cx + cos * (sealRingRadius - halfSq);
+    const y2 = cy + sin * (sealRingRadius - halfSq);
+    // Midpoint
+    const mx = (x1 + x2) / 2;
+    const my = (y1 + y2) / 2;
+    return { x1, y1, x2, y2, mx, my };
   };
 
   const lines = [
-    { key: 'guide', seal: oracle.guide, colour: ORACLE_COLOURS.guide },
-    { key: 'analog', seal: oracle.analog, colour: ORACLE_COLOURS.analog },
-    { key: 'antipode', seal: oracle.antipode, colour: ORACLE_COLOURS.antipode },
-    { key: 'occult', seal: oracle.occult, colour: ORACLE_COLOURS.occult },
+    { key: 'guide', seal: oracle.guide, style: ORACLE_STYLES.guide },
+    { key: 'analog', seal: oracle.analog, style: ORACLE_STYLES.analog },
+    { key: 'antipode', seal: oracle.antipode, style: ORACLE_STYLES.antipode },
+    { key: 'occult', seal: oracle.occult, style: ORACLE_STYLES.occult },
   ];
 
   return (
     <g>
-      {lines.map(({ key, seal, colour }) => {
-        const pos = getPos(seal.number);
+      {lines.map(({ key, seal, style }) => {
+        const { x1, y1, x2, y2, mx, my } = getEndpoints(seal.number);
         return (
-          <line
-            key={key}
-            x1={cx}
-            y1={cy}
-            x2={pos.x}
-            y2={pos.y}
-            stroke={colour}
-            strokeWidth={1}
-            opacity={0.3}
-            strokeDasharray="4 3"
-          />
+          <g key={key}>
+            <line
+              x1={x1} y1={y1} x2={x2} y2={y2}
+              stroke={style.colour}
+              strokeWidth={style.width}
+              opacity={0.22}
+            />
+            {/* Midpoint dot */}
+            <circle cx={mx} cy={my} r={1.5} fill={style.colour} opacity={0.3} />
+          </g>
         );
       })}
     </g>
