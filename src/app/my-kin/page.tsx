@@ -59,24 +59,27 @@ export default function MyKinPage() {
   // ── Result state: Signature Card ──
   if (showResult && kin && oracle) {
     return (
-      <div className="flex flex-col h-full max-w-md mx-auto px-4 py-4 overflow-y-auto">
+      <div className="flex flex-col h-full max-w-md mx-auto px-3 py-3 overflow-y-auto">
         <div
           className="rounded-2xl p-5 space-y-4 relative overflow-hidden"
           style={{
-            background: `linear-gradient(155deg, ${kin.seal.bgHex}cc, var(--bg-secondary) 60%)`,
-            border: `1px solid ${kin.seal.colourHex}18`,
+            background: `linear-gradient(155deg, ${kin.seal.bgHex} 0%, rgba(14,14,28,0.92) 55%)`,
+            border: `1px solid ${kin.seal.colourHex}30`,
           }}
         >
+          {/* Radial glow at top */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200px] h-[120px] rounded-full pointer-events-none" style={{ background: `radial-gradient(ellipse, ${kin.seal.colourHex}18, transparent 70%)` }} />
+
           {/* Seal icon + Kin number */}
-          <div className="text-center space-y-1.5">
+          <div className="text-center space-y-1.5 relative">
             <div className="flex justify-center">
-              <SealGlyph sealNumber={kin.seal.number} size={72} showBg />
+              <SealGlyph sealNumber={kin.seal.number} size={80} showBg />
             </div>
-            <div className="text-[9px] tracking-[0.15em] text-[var(--text-tertiary)] uppercase">Galactic Signature</div>
-            <div className="text-[48px] font-bold tabular-nums leading-none text-[var(--text-primary)]">
+            <div className="text-[10px] tracking-[0.3em] text-[var(--text-secondary)] uppercase">Galactic Signature</div>
+            <div className="text-[60px] font-bold tabular-nums leading-none text-white">
               {kin.number}
             </div>
-            <div className="text-[20px] font-medium" style={{ color: kin.seal.colourHex }}>
+            <div className="text-[20px] font-semibold" style={{ color: kin.seal.colourHex }}>
               {kin.title}
             </div>
           </div>
@@ -217,14 +220,18 @@ function Tag({ label, highlight }: { label: string; highlight?: boolean }) {
 }
 
 function OracleCell({ label, seal, highlight }: { label: string; seal: { name: string; colourHex: string; number: number }; highlight?: boolean }) {
+  const iconSize = highlight ? 44 : 34;
   return (
     <div
-      className="flex flex-col items-center gap-1 py-2 rounded-lg"
-      style={{ background: highlight ? 'rgba(255,255,255,0.04)' : 'transparent' }}
+      className="flex flex-col items-center gap-1 py-2.5 rounded-lg"
+      style={{
+        background: highlight ? 'rgba(255,255,255,0.05)' : 'transparent',
+        border: highlight ? `1px solid ${seal.colourHex}30` : 'none',
+      }}
     >
-      <SealGlyph sealNumber={seal.number} size={32} showBg />
-      <div className="text-[10px] font-medium" style={{ color: seal.colourHex }}>{seal.name}</div>
-      <div className="text-[8px] text-[var(--text-tertiary)]">{label}</div>
+      <SealGlyph sealNumber={seal.number} size={iconSize} showBg />
+      <div className="text-[11px] font-medium" style={{ color: seal.colourHex }}>{seal.name}</div>
+      <div className="text-[8px] text-[var(--text-dim)]">{label}</div>
     </div>
   );
 }

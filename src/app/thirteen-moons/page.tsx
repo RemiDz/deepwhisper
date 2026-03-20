@@ -73,45 +73,45 @@ export default function ThirteenMoonsPage() {
       </div>
 
       {/* Heptad day headers */}
-      <div className="grid grid-cols-7 gap-1 mb-1 shrink-0">
+      <div className="grid grid-cols-7 gap-[4px] mb-0.5 shrink-0 px-0">
         {['D', 'S', 'G', 'K', 'A', 'L', 'S'].map((d, i) => (
-          <div key={i} className="text-center text-[9px] text-[var(--text-tertiary)] font-medium">
+          <div key={i} className="text-center text-[9px] text-[var(--text-secondary)] font-medium">
             {d}
           </div>
         ))}
       </div>
 
-      {/* 28-day grid */}
-      <div className="grid grid-cols-7 gap-1 flex-1 min-h-0">
+      {/* 28-day grid — fills width, 4px gaps */}
+      <div className="grid grid-cols-7 gap-[4px] flex-1 min-h-0 px-0">
         {days.map((dayInfo, i) => {
           const isToday = dayInfo.moonDay === todayMoonDay;
-          const sealBg = dayInfo.kin ? dayInfo.kin.seal.bgHex : 'transparent';
-          const sealColour = dayInfo.kin ? dayInfo.kin.seal.colourHex : 'transparent';
+          const sealBg = dayInfo.kin ? dayInfo.kin.seal.bgHex : '#1a1a2a';
+          const sealColour = dayInfo.kin ? dayInfo.kin.seal.colourHex : '#888';
 
           return (
             <div
               key={i}
               onClick={() => handleDayTap(dayInfo.kin)}
-              className="relative flex flex-col items-center justify-center rounded-lg cursor-pointer"
+              className="relative flex flex-col items-center justify-center cursor-pointer gap-[1px]"
               style={{
                 background: isToday
-                  ? 'var(--purple-dim)'
-                  : `color-mix(in srgb, ${sealBg} 20%, transparent)`,
+                  ? 'rgba(192,132,252,0.18)'
+                  : `color-mix(in srgb, ${sealBg} 40%, transparent)`,
                 border: isToday
-                  ? '1.5px solid rgba(192,132,252,0.6)'
-                  : `0.5px solid color-mix(in srgb, ${sealColour} 8%, transparent)`,
+                  ? '1.5px solid rgba(192,132,252,0.65)'
+                  : `0.5px solid color-mix(in srgb, ${sealColour} 20%, transparent)`,
                 borderRadius: 8,
                 aspectRatio: '1',
               }}
             >
               {dayInfo.kin && (
-                <SealGlyph sealNumber={dayInfo.kin.seal.number} size={18} />
+                <SealGlyph sealNumber={dayInfo.kin.seal.number} size={22} />
               )}
-              <span className={`text-[9px] font-bold tabular-nums leading-none ${isToday ? 'text-[var(--purple)]' : 'text-[var(--text-primary)]'}`}>
+              <span className={`text-[10px] font-bold tabular-nums leading-none ${isToday ? 'text-[var(--purple)]' : 'text-white'}`}>
                 {dayInfo.moonDay}
               </span>
               {dayInfo.kin && (
-                <span className="text-[7px] tabular-nums leading-none" style={{ color: sealColour }}>
+                <span className="text-[8px] font-medium tabular-nums leading-none" style={{ color: sealColour }}>
                   {dayInfo.kin.number}
                 </span>
               )}

@@ -40,7 +40,7 @@ export default function WavespellPage() {
   }
 
   return (
-    <div className="flex flex-col h-full max-w-md mx-auto px-4 py-3">
+    <div className="flex flex-col h-full max-w-md mx-auto px-3 py-3">
       {/* Header with nav arrows */}
       <div className="flex items-center justify-between mb-3 shrink-0">
         <button
@@ -144,10 +144,10 @@ export default function WavespellPage() {
                   border: isToday
                     ? '1px solid rgba(192,132,252,0.25)'
                     : '0.5px solid rgba(255,255,255,0.04)',
-                  opacity: isFuture ? 0.5 : isPast ? 0.7 : 1,
+                  opacity: isFuture ? 0.6 : isPast ? 0.85 : 1,
                 }}
               >
-                <SealGlyph sealNumber={kin.seal.number} size={34} showBg />
+                <SealGlyph sealNumber={kin.seal.number} size={36} showBg />
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">

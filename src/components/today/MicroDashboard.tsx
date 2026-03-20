@@ -23,8 +23,8 @@ export default function MicroDashboard({ kin }: MicroDashboardProps) {
       {/* Wavespell: 13 segments */}
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] text-[var(--text-secondary)]">Wavespell</span>
-          <span className="text-[9px] text-[var(--text-tertiary)]">{wavespellSeal.name} · day {wavespellPos} of 13</span>
+          <span className="text-[10px] text-[#a8a6a0]">Wavespell</span>
+          <span className="text-[9px] text-[var(--text-secondary)]">{wavespellSeal.name} · day {wavespellPos} of 13</span>
         </div>
         <div className="flex gap-[2px]">
           {Array.from({ length: 13 }, (_, i) => {
@@ -39,8 +39,8 @@ export default function MicroDashboard({ kin }: MicroDashboardProps) {
                   background: isToday
                     ? 'var(--purple)'
                     : isPast
-                    ? 'rgba(192,132,252,0.4)'
-                    : 'rgba(255,255,255,0.06)',
+                    ? 'rgba(192,132,252,0.55)'
+                    : 'rgba(255,255,255,0.08)',
                   boxShadow: isToday ? '0 0 6px rgba(192,132,252,0.5)' : 'none',
                 }}
               />
@@ -52,8 +52,8 @@ export default function MicroDashboard({ kin }: MicroDashboardProps) {
       {/* Castle: 5 colour blocks */}
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] text-[var(--text-secondary)]">Castle</span>
-          <span className="text-[9px] text-[var(--text-tertiary)]">{kin.castle.quality} · Kin {castleDay}/52</span>
+          <span className="text-[10px] text-[#a8a6a0]">Castle</span>
+          <span className="text-[9px] text-[var(--text-secondary)]">{kin.castle.quality} · Kin {castleDay}/52</span>
         </div>
         <div className="flex gap-[3px]">
           {CASTLES.map((c) => {
@@ -65,7 +65,7 @@ export default function MicroDashboard({ kin }: MicroDashboardProps) {
                 className="flex-1 h-[5px] rounded-full"
                 style={{
                   background: colours[c.colour] ?? '#888',
-                  opacity: isActive ? 1 : 0.15,
+                  opacity: isActive ? 1 : 0.28,
                 }}
               />
             );
@@ -76,8 +76,8 @@ export default function MicroDashboard({ kin }: MicroDashboardProps) {
       {/* Spin: gradient progress */}
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] text-[var(--text-secondary)]">Spin</span>
-          <span className="text-[9px] text-[var(--text-tertiary)]">Day {kin.number} of 260 — {spinPct}%</span>
+          <span className="text-[10px] text-[#a8a6a0]">Spin</span>
+          <span className="text-[9px] text-[var(--text-secondary)]">Day {kin.number} of 260 — {spinPct}%</span>
         </div>
         <div className="h-[5px] rounded-full bg-white/[0.04] overflow-hidden">
           <div

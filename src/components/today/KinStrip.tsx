@@ -13,7 +13,7 @@ export default function KinStrip({ kin, moonData }: KinStripProps) {
     <div className="text-center space-y-1.5">
       {/* Kin number + title in a horizontal row */}
       <div className="flex items-baseline justify-center gap-2.5">
-        <span className="text-[34px] font-bold tabular-nums leading-none text-[var(--text-primary)]">
+        <span className="text-[34px] font-bold tabular-nums leading-none text-white">
           {kin.number}
         </span>
         <div className="text-left">

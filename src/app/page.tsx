@@ -94,24 +94,24 @@ export default function TodayPage() {
   }
 
   return (
-    <div className="flex flex-col h-full max-w-md mx-auto px-2 pt-2 pb-1">
-      {/* Header — compact */}
-      <header className="text-center mb-0.5 shrink-0">
-        <h1 className="text-[10px] font-semibold tracking-[0.25em] text-[var(--text-tertiary)] uppercase">
+    <div className="flex flex-col h-full max-w-md mx-auto px-1 pt-1 pb-0.5">
+      {/* Header — minimal */}
+      <header className="text-center shrink-0">
+        <h1 className="text-[9px] font-semibold tracking-[0.25em] text-[var(--text-tertiary)] uppercase">
           Deep Whisper
         </h1>
         {moonDate.moon && (
-          <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">
+          <p className="text-[10px] text-[var(--text-secondary)]">
             {moonDate.moon.name} · Day {moonDate.moonDay}
           </p>
         )}
         {moonDate.isDayOutOfTime && (
-          <p className="text-[11px] text-[var(--purple)]">Day Out of Time</p>
+          <p className="text-[10px] text-[var(--purple)]">Day Out of Time</p>
         )}
       </header>
 
-      {/* Galactic Compass — hero element, takes available space */}
-      <div className="flex-1 flex items-center justify-center min-h-0">
+      {/* Galactic Compass — fills upper screen */}
+      <div className="flex-1 flex items-center justify-center min-h-0 -mt-1">
         <GalacticCompass
           kin={kin}
           oracle={oracle}
@@ -121,8 +121,8 @@ export default function TodayPage() {
         />
       </div>
 
-      {/* Info below compass — compact, no scroll needed */}
-      <div className="space-y-2 shrink-0">
+      {/* Info below compass — tight spacing */}
+      <div className="space-y-1.5 shrink-0 -mt-1">
         <KinStrip kin={kin} moonData={moonData} />
         <MicroDashboard kin={kin} />
         <MilestoneCard kin={kin} />

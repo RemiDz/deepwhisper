@@ -49,8 +49,8 @@ body {
 
 /* Gentle opacity breathing — NO transform, NO scale */
 @keyframes breathe {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.55; }
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.5; }
 }
 .animate-breathe {
   animation: breathe 3s ease-in-out infinite;
