@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { MOONS, getMoonDate } from '@/lib/dreamspell/moons';
 import { getKinNumber, buildKin } from '@/lib/dreamspell/kin';
 import type { Moon13 } from '@/lib/dreamspell/types';
+import SealGlyph from '@/components/compass/SealGlyph';
 
 export default function ThirteenMoonsPage() {
   const today = useMemo(() => new Date(), []);
@@ -78,14 +79,12 @@ export default function ThirteenMoonsPage() {
               }`}
               style={{ background: isToday ? 'var(--purple-dim)' : 'var(--bg-card)' }}
             >
-              <span className={`text-sm font-medium tabular-nums ${isToday ? 'text-[var(--purple)]' : 'text-[var(--text-primary)]'}`}>
+              {dayInfo.kin && (
+                <SealGlyph sealNumber={dayInfo.kin.seal.number} size={18} />
+              )}
+              <span className={`text-[9px] font-medium tabular-nums leading-none ${isToday ? 'text-[var(--purple)]' : 'text-[var(--text-primary)]'}`}>
                 {dayInfo.moonDay}
               </span>
-              {dayInfo.kin && (
-                <span className="text-[8px] tabular-nums" style={{ color: dayInfo.kin.seal.colourHex }}>
-                  {dayInfo.kin.number}
-                </span>
-              )}
             </div>
           );
         })}

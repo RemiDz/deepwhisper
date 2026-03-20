@@ -6,7 +6,6 @@ import SealRing from './SealRing';
 import ToneRing from './ToneRing';
 import OracleLines from './OracleLines';
 import MoonPhase from './MoonPhase';
-import SealGlyph from './SealGlyph';
 
 interface GalacticCompassProps {
   kin: Kin;
@@ -23,6 +22,17 @@ export default function GalacticCompass({ kin, oracle, moonData, onCentreTap, on
   const sealRadius = size / 2 - 18;
   const toneRadius = size / 2 - 48;
   const moonSize = 68;
+
+  const sealOverlay = (
+    <img
+      src={kin.seal.iconPath}
+      alt={kin.seal.name}
+      width={32}
+      height={32}
+      style={{ borderRadius: 4, opacity: 0.45, mixBlendMode: 'screen' }}
+      draggable={false}
+    />
+  );
 
   return (
     <div className="relative flex items-center justify-center">
@@ -56,23 +66,9 @@ export default function GalacticCompass({ kin, oracle, moonData, onCentreTap, on
           cy={cy}
           radius={toneRadius}
         />
-
-        {/* Centre moon */}
-        <g
-          onClick={onCentreTap}
-          className="cursor-pointer"
-        >
-          <MoonPhase
-            moonData={moonData}
-            size={moonSize}
-            sealGlyph={<SealGlyph sealNumber={kin.seal.number} size={28} colour="rgba(255,255,255,0.6)" />}
-          />
-          {/* Position the moon in the centre — use foreignObject offset */}
-          {/* Actually SVG nested positioning: translate to centre */}
-        </g>
       </svg>
 
-      {/* Overlay centred moon using absolute positioning for cleaner rendering */}
+      {/* Overlay centred moon using absolute positioning */}
       <div
         className="absolute cursor-pointer"
         style={{
@@ -87,7 +83,7 @@ export default function GalacticCompass({ kin, oracle, moonData, onCentreTap, on
         <MoonPhase
           moonData={moonData}
           size={moonSize}
-          sealGlyph={<SealGlyph sealNumber={kin.seal.number} size={28} colour="rgba(255,255,255,0.6)" />}
+          sealGlyph={sealOverlay}
         />
       </div>
     </div>

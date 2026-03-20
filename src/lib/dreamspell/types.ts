@@ -8,7 +8,7 @@ export interface SolarSeal {
   power: string;
   action: string;
   essence: string;
-  glyphPath: string;     // SVG path data
+  iconPath: string;      // Path to PNG icon in /public/icons/
 }
 
 export interface GalacticTone {

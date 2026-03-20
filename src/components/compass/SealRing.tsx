@@ -17,6 +17,9 @@ export default function SealRing({ activeSealNumber, oracle, cx, cy, radius, onS
     ? new Set([oracle.guide.number, oracle.analog.number, oracle.antipode.number, oracle.occult.number])
     : new Set<number>();
 
+  const squareSize = 28;
+  const iconSize = squareSize - 4;
+
   return (
     <g>
       {SEALS.map((seal, i) => {
@@ -25,14 +28,14 @@ export default function SealRing({ activeSealNumber, oracle, cx, cy, radius, onS
         const sy = cy + Math.sin(angle) * radius;
         const isActive = seal.number === activeSealNumber;
         const isOracle = oracleSeals.has(seal.number);
-        const opacity = isActive ? 1 : isOracle ? 0.8 : 0.25;
-        const squareSize = 22;
+        const opacity = isActive ? 1 : isOracle ? 0.8 : 0.35;
 
         return (
           <g
             key={seal.number}
             onClick={() => onSealTap?.(seal.number)}
             className="cursor-pointer"
+            opacity={opacity}
           >
             {/* Background square */}
             <rect
@@ -40,27 +43,18 @@ export default function SealRing({ activeSealNumber, oracle, cx, cy, radius, onS
               y={sy - squareSize / 2}
               width={squareSize}
               height={squareSize}
-              rx={3}
+              rx={6}
               fill={seal.bgHex}
-              opacity={opacity}
             />
-            {/* Glyph */}
-            <g
-              transform={`translate(${sx}, ${sy})`}
-              opacity={opacity}
+            {/* PNG icon */}
+            <image
+              href={seal.iconPath}
+              x={sx - iconSize / 2}
+              y={sy - iconSize / 2}
+              width={iconSize}
+              height={iconSize}
               className={isActive ? 'animate-pulse-gentle' : ''}
-            >
-              <svg viewBox="-14 -14 28 28" width={squareSize - 4} height={squareSize - 4} x={-(squareSize - 4) / 2} y={-(squareSize - 4) / 2}>
-                <path
-                  d={seal.glyphPath}
-                  fill="none"
-                  stroke={seal.colourHex}
-                  strokeWidth={1.5}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </g>
+            />
           </g>
         );
       })}

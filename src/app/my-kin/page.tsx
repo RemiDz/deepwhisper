@@ -74,7 +74,7 @@ export default function MyKinPage() {
           {/* Glyph + Kin */}
           <div className="text-center space-y-2">
             <div className="flex justify-center">
-              <SealGlyph sealNumber={kin.seal.number} size={64} />
+              <SealGlyph sealNumber={kin.seal.number} size={72} showBg />
             </div>
             <div className="text-4xl font-bold tabular-nums" style={{ color: kin.seal.colourHex }}>
               Kin {kin.number}
@@ -232,7 +232,7 @@ function OracleCell({ label, seal, highlight }: { label: string; seal: { name: s
       className="flex flex-col items-center gap-1 p-2 rounded-lg"
       style={{ background: highlight ? 'rgba(255,255,255,0.04)' : 'transparent' }}
     >
-      <SealGlyph sealNumber={seal.number} size={24} />
+      <SealGlyph sealNumber={seal.number} size={36} showBg />
       <div className="text-[10px]" style={{ color: seal.colourHex }}>{seal.name}</div>
       <div className="text-[8px] text-[var(--text-tertiary)]">{label}</div>
     </div>

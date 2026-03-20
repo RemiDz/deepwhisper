@@ -61,8 +61,8 @@ export default function WavespellPage() {
                 </span>
               </div>
 
-              {/* Seal glyph */}
-              <SealGlyph sealNumber={kin.seal.number} size={28} />
+              {/* Seal icon */}
+              <SealGlyph sealNumber={kin.seal.number} size={32} showBg />
 
               {/* Kin info */}
               <div className="flex-1 min-w-0">

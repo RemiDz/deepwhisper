@@ -5,30 +5,51 @@ import { SEALS } from '@/lib/dreamspell/seals';
 interface SealGlyphProps {
   sealNumber: number;
   size?: number;
-  colour?: string;
   className?: string;
+  opacity?: number;
+  showBg?: boolean;
+  moonOverlay?: boolean;
 }
 
-export default function SealGlyph({ sealNumber, size = 22, colour, className }: SealGlyphProps) {
+/**
+ * Renders a solar seal as a PNG icon image.
+ * Used in HTML contexts (pages, cards, bottom sheets).
+ * For SVG contexts (SealRing), use the SVG <image> element directly.
+ */
+export default function SealGlyph({
+  sealNumber,
+  size = 22,
+  className,
+  opacity = 1,
+  showBg = false,
+  moonOverlay = false,
+}: SealGlyphProps) {
   const seal = SEALS[sealNumber];
-  const c = colour ?? seal.colourHex;
 
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="-14 -14 28 28"
-      className={className}
-      aria-label={seal.name}
+    <div
+      className={`inline-flex items-center justify-center shrink-0 ${className ?? ''}`}
+      style={{
+        width: size,
+        height: size,
+        borderRadius: showBg ? Math.max(6, size * 0.15) : 4,
+        background: showBg ? seal.bgHex : 'transparent',
+        opacity,
+        ...(moonOverlay ? { mixBlendMode: 'screen' as const } : {}),
+      }}
     >
-      <path
-        d={seal.glyphPath}
-        fill="none"
-        stroke={c}
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
+      <img
+        src={seal.iconPath}
+        alt={seal.name}
+        width={showBg ? size * 0.8 : size}
+        height={showBg ? size * 0.8 : size}
+        style={{
+          borderRadius: 4,
+          display: 'block',
+          pointerEvents: 'none',
+        }}
+        draggable={false}
       />
-    </svg>
+    </div>
   );
 }

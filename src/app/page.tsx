@@ -11,6 +11,7 @@ import KinStrip from '@/components/today/KinStrip';
 import MicroDashboard from '@/components/today/MicroDashboard';
 import MilestoneCard from '@/components/today/MilestoneCard';
 import BottomSheet from '@/components/layout/BottomSheet';
+import SealGlyph from '@/components/compass/SealGlyph';
 
 export default function TodayPage() {
   const [sheetContent, setSheetContent] = useState<{ title: string; body: React.ReactNode } | null>(null);
@@ -28,6 +29,9 @@ export default function TodayPage() {
       body: (
         <div className="space-y-4">
           <div className="text-center">
+            <div className="flex justify-center mb-2">
+              <SealGlyph sealNumber={kin.seal.number} size={48} showBg />
+            </div>
             <div className="text-2xl font-bold" style={{ color: kin.seal.colourHex }}>Kin {kin.number}</div>
             <div className="text-sm text-[var(--text-secondary)] mt-1">{kin.title}</div>
           </div>
@@ -42,10 +46,10 @@ export default function TodayPage() {
           <div className="pt-2 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
             <div className="text-xs text-[var(--text-tertiary)] mb-2">FIFTH FORCE ORACLE</div>
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <OraclePill label="Guide" seal={oracle.guide.name} colour={oracle.guide.colourHex} />
-              <OraclePill label="Analog" seal={oracle.analog.name} colour={oracle.analog.colourHex} />
-              <OraclePill label="Antipode" seal={oracle.antipode.name} colour={oracle.antipode.colourHex} />
-              <OraclePill label="Occult" seal={oracle.occult.name} colour={oracle.occult.colourHex} />
+              <OraclePill label="Guide" seal={oracle.guide.name} colour={oracle.guide.colourHex} sealNumber={oracle.guide.number} />
+              <OraclePill label="Analog" seal={oracle.analog.name} colour={oracle.analog.colourHex} sealNumber={oracle.analog.number} />
+              <OraclePill label="Antipode" seal={oracle.antipode.name} colour={oracle.antipode.colourHex} sealNumber={oracle.antipode.number} />
+              <OraclePill label="Occult" seal={oracle.occult.name} colour={oracle.occult.colourHex} sealNumber={oracle.occult.number} />
             </div>
           </div>
         </div>
@@ -60,6 +64,9 @@ export default function TodayPage() {
       body: (
         <div className="space-y-3">
           <div className="text-center">
+            <div className="flex justify-center mb-2">
+              <SealGlyph sealNumber={seal.number} size={56} showBg />
+            </div>
             <div className="text-xl font-bold" style={{ color: seal.colourHex }}>{seal.name}</div>
             <div className="text-xs text-[var(--text-tertiary)]">Seal {seal.number + 1} of 20</div>
           </div>
@@ -142,10 +149,10 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function OraclePill({ label, seal, colour }: { label: string; seal: string; colour: string }) {
+function OraclePill({ label, seal, colour, sealNumber }: { label: string; seal: string; colour: string; sealNumber: number }) {
   return (
     <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg" style={{ background: 'var(--bg-card)' }}>
-      <div className="w-2 h-2 rounded-full" style={{ background: colour }} />
+      <SealGlyph sealNumber={sealNumber} size={20} showBg />
       <div>
         <div className="text-[9px] text-[var(--text-tertiary)]">{label}</div>
         <div className="text-xs" style={{ color: colour }}>{seal}</div>
