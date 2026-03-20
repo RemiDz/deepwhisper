@@ -3,6 +3,8 @@
 import { useMemo, useState, useCallback } from 'react';
 import { MOONS, getMoonDate } from '@/lib/dreamspell/moons';
 import { getKinNumber, buildKin } from '@/lib/dreamspell/kin';
+import { getWavespellPosition, getWavespellSeal } from '@/lib/dreamspell/wavespell';
+import { MOON_TEACHINGS } from '@/lib/dreamspell/moon-teachings';
 import type { Moon13, Kin } from '@/lib/dreamspell/types';
 import SealGlyph from '@/components/compass/SealGlyph';
 import BottomSheet from '@/components/layout/BottomSheet';
@@ -15,6 +17,7 @@ export default function ThirteenMoonsPage() {
     currentMoonDate.moon ? currentMoonDate.moon.number - 1 : 0
   );
   const [selectedDayKin, setSelectedDayKin] = useState<Kin | null>(null);
+  const [explainerOpen, setExplainerOpen] = useState(false);
 
   const selectedMoon = MOONS[selectedMoonIndex];
 
@@ -28,12 +31,42 @@ export default function ThirteenMoonsPage() {
   const days = useMemo(() => generateMoonDays(selectedMoon, moonYearStart), [selectedMoon, moonYearStart]);
   const todayMoonDay = currentMoonDate.moon?.number === selectedMoon.number ? currentMoonDate.moonDay : null;
 
+  const teaching = MOON_TEACHINGS[selectedMoon.number];
+
+  const upcomingEvents = useMemo(() => {
+    const events: { moonDay: number; date: Date; type: string; label: string; description: string }[] = [];
+    const castleStarts = new Set([1, 53, 105, 157, 209]);
+
+    for (const dayInfo of days) {
+      if (!dayInfo.kin) continue;
+
+      if (dayInfo.kin.isGAP) {
+        events.push({ moonDay: dayInfo.moonDay, date: dayInfo.gregorianDate, type: 'gap', label: 'GAP Day', description: 'Portal of intensified energy' });
+      }
+
+      if (getWavespellPosition(dayInfo.kin.number) === 1) {
+        const seal = getWavespellSeal(dayInfo.kin.number);
+        events.push({ moonDay: dayInfo.moonDay, date: dayInfo.gregorianDate, type: 'wavespell', label: 'Wavespell Shift', description: `${seal.colour} ${seal.name} wavespell begins` });
+      }
+
+      if (castleStarts.has(dayInfo.kin.number)) {
+        events.push({ moonDay: dayInfo.moonDay, date: dayInfo.gregorianDate, type: 'castle', label: 'Castle Shift', description: `${dayInfo.kin.castle.name} begins` });
+      }
+
+      if (dayInfo.gregorianDate.getMonth() === 6 && dayInfo.gregorianDate.getDate() === 25) {
+        events.push({ moonDay: dayInfo.moonDay, date: dayInfo.gregorianDate, type: 'dot', label: 'Day Out of Time', description: 'Celebration of freedom and forgiveness' });
+      }
+    }
+
+    return events;
+  }, [days]);
+
   const handleDayTap = useCallback((kin: Kin | null) => {
     if (kin) setSelectedDayKin(kin);
   }, []);
 
   return (
-    <div className="flex flex-col h-full max-w-md mx-auto px-4 py-3">
+    <div className="flex flex-col max-w-md mx-auto px-4 py-3">
       {/* Moon navigator */}
       <div className="flex items-center justify-between mb-3 shrink-0">
         <button
@@ -126,6 +159,87 @@ export default function ThirteenMoonsPage() {
         <span className="text-[var(--purple)]">{selectedMoon.tone.name}</span> — {selectedMoon.tone.action} · {selectedMoon.tone.power} · {selectedMoon.tone.essence}
       </div>
 
+      {/* Section 1: About This Moon */}
+      {teaching && (
+        <div className="mt-6 rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-sm">🌙</span>
+            <span className="text-[13px] font-semibold text-[var(--text-primary)]">About the {selectedMoon.name}</span>
+          </div>
+          <p className="text-[11px] text-[var(--text-secondary)] italic mb-3">&ldquo;{selectedMoon.question}&rdquo;</p>
+
+          <div className="text-[9px] font-semibold tracking-[0.1em] text-[var(--purple)] uppercase mb-1">Theme</div>
+          <p className="text-[12px] text-[var(--text-secondary)] mb-3">{teaching.theme}</p>
+
+          <p className="text-[12px] leading-[1.6] text-[#b8b5ad] mb-3">{teaching.guidance}</p>
+
+          <div className="text-[9px] font-semibold tracking-[0.1em] text-[var(--purple)] uppercase mb-1">Daily Practice</div>
+          <p className="text-[12px] leading-[1.6] text-[#b8b5ad]">{teaching.practice}</p>
+        </div>
+      )}
+
+      {/* Section 2: What's Coming Up */}
+      <div className="mt-4 rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)' }}>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-sm">⚡</span>
+          <span className="text-[13px] font-semibold text-[var(--text-primary)]">What&apos;s Coming Up</span>
+        </div>
+
+        {upcomingEvents.length === 0 ? (
+          <p className="text-[12px] text-[var(--text-tertiary)]">No major galactic events remaining this moon.</p>
+        ) : (
+          <div className="space-y-3">
+            {upcomingEvents.map((ev, i) => (
+              <div key={i}>
+                <div className="text-[11px] text-[var(--text-secondary)]">
+                  <span className="font-semibold text-[var(--text-primary)]">Day {ev.moonDay}</span>
+                  {' '}({formatShortDate(ev.date)}) · <span className="text-[var(--purple)]">{ev.label}</span>
+                </div>
+                <p className="text-[11px] text-[var(--text-tertiary)]">{ev.description}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Section 3: New to 13 Moon Calendar? collapsible */}
+      <div className="mt-4 mb-24">
+        <button
+          onClick={() => setExplainerOpen(!explainerOpen)}
+          className="flex items-center gap-2 w-full text-left py-2"
+        >
+          <span className="text-sm">ℹ️</span>
+          <span className="text-[12px] text-[var(--text-secondary)]">New to the 13 Moon Calendar?</span>
+          <span className="text-[10px] text-[var(--text-tertiary)] ml-auto">{explainerOpen ? '˄' : '˅'}</span>
+        </button>
+
+        {explainerOpen && (
+          <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <p className="text-[12px] leading-[1.6] text-[#b8b5ad]">
+              The 13 Moon calendar is a natural time system based on the moon&apos;s 28-day cycle.
+              Unlike the Gregorian calendar with its irregular months (28–31 days), each of the 13
+              Moons has exactly 28 days — 4 perfect weeks.
+            </p>
+            <p className="text-[12px] leading-[1.6] text-[#b8b5ad]">
+              Combined with the 260-day Tzolkin (galactic spin), each day carries a unique energy
+              called a Kin. Your daily Kin is shown in each cell above — the coloured icon is the
+              Solar Seal and the number is the Kin number.
+            </p>
+            <div className="text-[12px] leading-[1.6] text-[#b8b5ad]">
+              The 13 Moon calendar helps you:
+              <ul className="list-disc list-inside mt-1 space-y-0.5">
+                <li>Sync with natural cycles instead of artificial time</li>
+                <li>Track your personal energy patterns across the year</li>
+                <li>Connect with a global community of practitioners</li>
+              </ul>
+            </div>
+            <p className="text-[12px] leading-[1.6] text-[#b8b5ad]">
+              The current moon&apos;s question (shown at the top) is your guiding theme for these 28 days.
+            </p>
+          </div>
+        )}
+      </div>
+
       {/* Day detail bottom sheet */}
       <BottomSheet
         open={!!selectedDayKin}
@@ -202,6 +316,11 @@ function DayKinDetail({ kin }: { kin: Kin }) {
       )}
     </div>
   );
+}
+
+function formatShortDate(date: Date): string {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${months[date.getMonth()]} ${date.getDate()}`;
 }
 
 function Chevron({ dir }: { dir: 'left' | 'right' }) {
