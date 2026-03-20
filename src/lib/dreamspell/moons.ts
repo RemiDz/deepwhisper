@@ -23,7 +23,9 @@ export const MOONS: Moon13[] = [
  * July 25 = Day Out of Time (returns moon 0, day 0).
  * Feb 29 = 0.0 Hunab Ku (returns moon 0, day 0).
  */
-export function getMoonDate(date: Date): { moon: Moon13 | null; moonDay: number; isDayOutOfTime: boolean; isHunabKu: boolean } {
+export function getMoonDate(inputDate: Date): { moon: Moon13 | null; moonDay: number; isDayOutOfTime: boolean; isHunabKu: boolean } {
+  // Normalize to midnight so time-of-day doesn't affect the day count
+  const date = new Date(inputDate.getFullYear(), inputDate.getMonth(), inputDate.getDate());
   const month = date.getMonth() + 1; // 1-12
   const day = date.getDate();
   const year = date.getFullYear();
