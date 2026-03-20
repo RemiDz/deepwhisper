@@ -104,9 +104,33 @@ export async function generateGalacticBlueprint(kin: Kin): Promise<JsPDFType> {
   // Preload all seal images
   const sealImages = await preloadAllSeals();
 
+  // Light background colours for icons on white PDF
+  const pdfIconBg: Record<string, string> = {
+    Red: '#fee2e2',
+    White: '#f1f0ed',
+    Blue: '#dbeafe',
+    Yellow: '#fef9c3',
+  };
+
   const addSealImg = (sealIndex: number, x: number, y: number, size: number) => {
     const data = sealImages.get(sealIndex);
-    if (data) doc.addImage(data, 'PNG', x, y, size, size);
+    if (!data) return;
+    // Draw light coloured rounded rect behind icon
+    const seal = SEALS[sealIndex];
+    const bgColour = pdfIconBg[seal.colour] ?? '#f1f0ed';
+    const pad = size * 0.08; // padding around icon
+    const bgRgb = hexRgb(bgColour);
+    doc.setFillColor(...bgRgb);
+    doc.roundedRect(x - pad, y - pad, size + pad * 2, size + pad * 2, 2, 2, 'F');
+    // Subtle border in seal colour
+    const borderRgb = hexRgb(seal.colourHex);
+    doc.setDrawColor(borderRgb[0], borderRgb[1], borderRgb[2]);
+    doc.setGState(doc.GState({ opacity: 0.3 }));
+    doc.setLineWidth(0.3);
+    doc.roundedRect(x - pad, y - pad, size + pad * 2, size + pad * 2, 2, 2, 'S');
+    doc.setGState(doc.GState({ opacity: 1 }));
+    // Place PNG on top
+    doc.addImage(data, 'PNG', x, y, size, size);
   };
 
   // ── Helpers ───────────────────────────────────────────────────────────
@@ -425,10 +449,13 @@ export async function generateGalacticBlueprint(kin: Kin): Promise<JsPDFType> {
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...hexRgb(seal.colourHex));
     doc.text(`${role}: ${seal.colour} ${seal.name}`, M, y);
+    y += 5;
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...hexRgb(TEXT_DARK));
-    doc.text(` — ${desc}`, M + doc.getTextWidth(`${role}: ${seal.colour} ${seal.name}`), y);
-    y += 7;
+    doc.setFontSize(10);
+    const descLines = doc.splitTextToSize(desc, CW);
+    doc.text(descLines, M, y);
+    y += descLines.length * 4.5 + 4;
   }
 
   footer(4);
