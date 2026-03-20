@@ -32,9 +32,9 @@ export default function GalacticCompass({ kin, oracle, moonData, onCentreTap, on
   const toneY = cy + Math.sin(activeSealAngle) * toneGlyphRadius;
 
   // Depth ring radii
-  const depthRing1 = sealRadius + sealSquareSize / 2 + 8;
+  const depthRing1 = sealRadius + 10;
   const depthRing2 = (sealRadius + moonRadius) / 2;
-  const depthRing3 = moonRadius + 20;
+  const depthRing3 = moonRadius + 15;
 
   return (
     <div className="relative flex items-center justify-center w-full" style={{ maxWidth: size, aspectRatio: '1' }}>
@@ -42,13 +42,13 @@ export default function GalacticCompass({ kin, oracle, moonData, onCentreTap, on
       <div
         className="absolute"
         style={{
-          width: '110%',
-          height: '110%',
+          width: '115%',
+          height: '115%',
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(192,132,252,0.06) 0%, rgba(30,30,60,0.08) 40%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(192,132,252,0.07) 0%, rgba(30,30,60,0.05) 35%, transparent 65%)',
           pointerEvents: 'none',
           zIndex: 0,
         }}
@@ -62,12 +62,9 @@ export default function GalacticCompass({ kin, oracle, moonData, onCentreTap, on
         style={{ zIndex: 1 }}
       >
         {/* 2b. Concentric depth rings */}
-        <circle cx={cx} cy={cy} r={depthRing1} fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth={1} />
-        <circle cx={cx} cy={cy} r={depthRing2} fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth={0.5} />
-        <circle cx={cx} cy={cy} r={depthRing3} fill="none" stroke="rgba(255,255,255,0.02)" strokeWidth={0.5} />
-
-        {/* Structural ring guide */}
-        <circle cx={cx} cy={cy} r={sealRadius + sealSquareSize / 2 + 3} fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth={0.5} />
+        <circle cx={cx} cy={cy} r={depthRing1} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={1} />
+        <circle cx={cx} cy={cy} r={depthRing2} fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth={0.8} />
+        <circle cx={cx} cy={cy} r={depthRing3} fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth={0.6} />
 
         {/* Oracle connection lines */}
         <OracleLines
@@ -149,7 +146,7 @@ export default function GalacticCompass({ kin, oracle, moonData, onCentreTap, on
           right: 0,
           bottom: 0,
           borderRadius: '50%',
-          background: 'radial-gradient(circle, transparent 50%, rgba(0,0,0,0.3) 100%)',
+          background: 'radial-gradient(circle, transparent 45%, rgba(0,0,0,0.25) 100%)',
           pointerEvents: 'none',
           zIndex: 3,
         }}

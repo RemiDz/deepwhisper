@@ -46,16 +46,26 @@ export default function OracleLines({ oracle, cx, cy, moonRadius, sealRingRadius
 
   return (
     <g>
+      <defs>
+        {lines.map(({ key, seal, style }) => {
+          const { x1, y1, x2, y2 } = getEndpoints(seal.number);
+          return (
+            <linearGradient key={`grad-${key}`} id={`oracle-grad-${key}`} x1={x1} y1={y1} x2={x2} y2={y2} gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor={style.colour} stopOpacity={0.02} />
+              <stop offset="100%" stopColor={style.colour} stopOpacity={0.15} />
+            </linearGradient>
+          );
+        })}
+      </defs>
       {lines.map(({ key, seal, style }) => {
         const { x1, y1, x2, y2, mx, my } = getEndpoints(seal.number);
         return (
           <g key={key}>
             <line
               x1={x1} y1={y1} x2={x2} y2={y2}
-              stroke={style.colour}
+              stroke={`url(#oracle-grad-${key})`}
               strokeWidth={0.8}
               strokeDasharray="4 3"
-              opacity={0.15}
             />
             {/* Midpoint dot */}
             <circle cx={mx} cy={my} r={1.5} fill={style.colour} opacity={0.25} />
