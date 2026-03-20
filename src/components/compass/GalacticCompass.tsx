@@ -23,9 +23,9 @@ export default function GalacticCompass({ kin, oracle, moonData, onCentreTap, on
   // Ring radii — proportionally larger
   const moonSize = 86;
   const moonRadius = moonSize / 2 - 2;
-  const toneRadius = 112;
   const sealRadius = 150;
   const sealSquareSize = 30;
+  const toneRadius = Math.round(sealRadius * 0.55); // ~82, halfway between moon and seals
 
   const sealOverlay = (
     <img
@@ -48,8 +48,8 @@ export default function GalacticCompass({ kin, oracle, moonData, onCentreTap, on
       >
         {/* Structural ring guides */}
         <circle cx={cx} cy={cy} r={sealRadius + sealSquareSize / 2 + 3} fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth={0.5} />
-        <circle cx={cx} cy={cy} r={toneRadius + 16} fill="none" stroke="rgba(255,255,255,0.035)" strokeWidth={0.5} />
-        <circle cx={cx} cy={cy} r={toneRadius - 16} fill="none" stroke="rgba(255,255,255,0.035)" strokeWidth={0.5} />
+        <circle cx={cx} cy={cy} r={toneRadius + 18} fill="none" stroke="rgba(255,255,255,0.035)" strokeWidth={0.5} />
+        <circle cx={cx} cy={cy} r={toneRadius - 18} fill="none" stroke="rgba(255,255,255,0.035)" strokeWidth={0.5} />
 
         {/* Oracle connection lines */}
         <OracleLines
