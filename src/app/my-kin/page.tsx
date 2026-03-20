@@ -66,14 +66,14 @@ export default function MyKinPage() {
     return (
       <div className="flex flex-col h-full max-w-md mx-auto px-3 py-3 overflow-y-auto">
         <div
-          className="rounded-2xl p-5 space-y-4 relative overflow-hidden"
+          className="rounded-2xl p-5 space-y-4 relative"
           style={{
             background: `linear-gradient(155deg, ${kin.seal.bgHex} 0%, rgba(14,14,28,0.92) 55%)`,
             border: `1px solid ${kin.seal.colourHex}30`,
           }}
         >
-          {/* Radial glow at top */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200px] h-[120px] rounded-full pointer-events-none" style={{ background: `radial-gradient(ellipse, ${kin.seal.colourHex}18, transparent 70%)` }} />
+          {/* Radial glow at top — decorative, clipped to card via overflow-clip on this element only */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200px] h-[120px] rounded-full pointer-events-none overflow-hidden" style={{ background: `radial-gradient(ellipse, ${kin.seal.colourHex}18, transparent 70%)` }} />
 
           {/* Seal icon + Kin number */}
           <div className="text-center space-y-1.5 relative">

@@ -97,9 +97,9 @@ export default function TodayPage() {
   }
 
   return (
-    <div className="flex flex-col h-full max-w-md mx-auto px-3 pt-2 pb-1 overflow-visible">
+    <div className="max-w-md mx-auto px-3 pt-2 pb-20 overflow-y-auto h-full" style={{ WebkitOverflowScrolling: 'touch' }}>
       {/* Header — full width, no clipping */}
-      <header className="text-center shrink-0 w-full">
+      <header className="text-center w-full">
         <h1 className="text-[10px] font-semibold tracking-[0.2em] text-[var(--text-tertiary)] uppercase">
           Deep Whisper
         </h1>
@@ -113,8 +113,8 @@ export default function TodayPage() {
         )}
       </header>
 
-      {/* Galactic Compass — centred in available space */}
-      <div className="flex-1 flex items-center justify-center min-h-0">
+      {/* Galactic Compass — centred */}
+      <div className="flex items-center justify-center py-2">
         <GalacticCompass
           kin={kin}
           oracle={oracle}
@@ -125,7 +125,7 @@ export default function TodayPage() {
       </div>
 
       {/* Info below compass */}
-      <div className="space-y-2 shrink-0">
+      <div className="space-y-2">
         <KinStrip kin={kin} moonData={moonData} />
         <DeclarationCard kinNumber={kin.number} sealColourHex={kin.seal.colourHex} />
         <MicroDashboard kin={kin} />

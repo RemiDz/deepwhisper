@@ -39,7 +39,7 @@ export default function GalacticCompass({ kin, oracle, moonData, onCentreTap, on
   );
 
   return (
-    <div className="relative flex items-center justify-center" style={{ width: size, height: size, maxWidth: '96vw' }}>
+    <div className="relative flex items-center justify-center w-full" style={{ maxWidth: size, aspectRatio: '1' }}>
       <svg
         width={size}
         height={size}
