@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useRef } from 'react';
 import { getKinForDateFull, buildKin } from '@/lib/dreamspell/kin';
 import { getOracle } from '@/lib/dreamspell/oracle';
 import { getMoonDate } from '@/lib/dreamspell/moons';
@@ -8,6 +8,7 @@ import { getMoonData } from '@/lib/astronomy/moon';
 import { SEALS } from '@/lib/dreamspell/seals';
 import { getSealDescription, getToneDescription, getDeclaration } from '@/lib/galactic-content';
 import GearWheel from '@/components/compass/GearWheel';
+import type { GearWheelHandle } from '@/components/compass/GearWheel';
 import KinStrip from '@/components/today/KinStrip';
 import MicroDashboard from '@/components/today/MicroDashboard';
 import MilestoneCard from '@/components/today/MilestoneCard';
@@ -20,6 +21,8 @@ import EnergyIntensity from '@/components/energy/EnergyIntensity';
 export default function TodayPage() {
   const [sheetContent, setSheetContent] = useState<{ title: string; body: React.ReactNode } | null>(null);
   const [dayOffset, setDayOffset] = useState(0);
+  const [cinPhase, setCinPhase] = useState<'idle' | 'running' | 'complete'>('idle');
+  const gearRef = useRef<GearWheelHandle>(null);
 
   // Compute target date from offset
   const targetDate = useMemo(() => {
@@ -38,6 +41,10 @@ export default function TodayPage() {
 
   const handleDayChange = useCallback((delta: number) => {
     setDayOffset(prev => prev + delta);
+  }, []);
+
+  const handleAnimPhaseChange = useCallback((phase: 'idle' | 'running' | 'complete') => {
+    setCinPhase(phase);
   }, []);
 
   const handleCentreTap = useCallback(() => {
@@ -238,6 +245,7 @@ export default function TodayPage() {
         {/* Gear Wheel */}
         <div className="flex items-center justify-center py-2">
           <GearWheel
+            ref={gearRef}
             kinNumber={kin.number}
             sealIndex={sealIndex}
             toneIndex={toneIndex}
@@ -245,12 +253,20 @@ export default function TodayPage() {
             onCentreTap={handleCentreTap}
             onSealTap={handleSealTap}
             onDayChange={handleDayChange}
+            onAnimPhaseChange={handleAnimPhaseChange}
           />
         </div>
 
         {/* Navigation buttons */}
         <div className="flex flex-col items-center -mt-1 mb-2 gap-1">
-          <div className="flex items-center gap-3">
+          <div
+            className="flex items-center gap-3"
+            style={{
+              opacity: cinPhase === 'running' ? 0.3 : 1,
+              transition: 'opacity 0.3s',
+              pointerEvents: cinPhase === 'running' ? 'none' : 'auto',
+            }}
+          >
             <button
               onClick={() => handleDayChange(-1)}
               className="tap-feedback flex items-center justify-center w-9 h-9 rounded-full transition-colors"
@@ -265,7 +281,7 @@ export default function TodayPage() {
               </svg>
             </button>
             <button
-              onClick={() => setDayOffset(0)}
+              onClick={() => { setDayOffset(0); gearRef.current?.startAnimation(); }}
               className="tap-feedback px-5 py-1.5 rounded-full text-[11px] font-medium transition-colors"
               style={{
                 background: dayOffset !== 0 ? 'rgba(192,132,252,0.12)' : 'rgba(255,255,255,0.04)',
@@ -295,8 +311,14 @@ export default function TodayPage() {
           )}
         </div>
 
-        {/* Info below wheel */}
-        <div className="space-y-3">
+        {/* Info below wheel — fades in after cinematic animation */}
+        <div
+          className="space-y-3"
+          style={{
+            opacity: cinPhase === 'complete' ? 1 : 0,
+            transition: cinPhase === 'complete' ? 'opacity 0.4s ease-out' : 'none',
+          }}
+        >
           <KinStrip kin={kin} moonData={moonData} />
           <EnergyIntensity sealIndex={sealIndex} toneIndex={toneIndex} />
           <DeclarationCard kinNumber={kin.number} sealColourHex={kin.seal.colourHex} />

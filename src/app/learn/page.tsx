@@ -180,19 +180,24 @@ function StepTones() {
         13 levels of creative power, running 1 to 13 then restarting.
       </p>
 
-      {/* Tone row with dot-and-bar */}
+      {/* Tone tiles */}
       <div className="flex flex-wrap justify-center gap-1.5">
         {TONES.map((tone) => {
-          const bars = Math.floor(tone.number / 5);
+          const bars = tone.number % 5 === 0 ? tone.number / 5 : Math.floor(tone.number / 5);
           const dots = tone.number % 5;
           return (
             <div
               key={tone.number}
               className="flex flex-col items-center gap-1 p-1.5 rounded-lg"
-              style={{ background: 'rgba(192,132,252,0.06)', minWidth: 42 }}
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '0.5px solid rgba(255,255,255,0.08)',
+                borderRadius: 8,
+                minWidth: 42,
+              }}
             >
               <ToneGlyph bars={bars} dots={dots} size={16} />
-              <span className="text-[9px] font-bold text-[#c084fc]">{tone.number}</span>
+              <span className="text-[9px] font-bold text-white">{tone.number}</span>
               <span className="text-[7px] text-[var(--text-tertiary)] leading-tight text-center">{tone.name}</span>
             </div>
           );
@@ -215,7 +220,6 @@ function StepTones() {
             strokeWidth={2}
             points={Array.from({ length: 13 }, (_, i) => {
               const x = 10 + i * 20;
-              // Wave shape: rises to peak, dips at 7, rises, ends
               const heights = [50, 42, 34, 26, 18, 14, 10, 18, 14, 10, 22, 30, 8];
               return `${x},${heights[i]}`;
             }).join(' ')}
@@ -241,7 +245,7 @@ function StepTones() {
 // ===================== Step 4: 13 Moons =====================
 
 function StepMoons() {
-  const DAY_NAMES = ['D', 'S', 'G', 'K', 'A', 'L', 'S'];
+  const DAY_FULL_NAMES = ['Dali', 'Seli', 'Gamma', 'Kali', 'Alpha', 'Limi', 'Silio'];
 
   return (
     <div className="space-y-3">
@@ -263,9 +267,9 @@ function StepMoons() {
       <div className="mx-auto" style={{ maxWidth: 260 }}>
         <div className="text-[9px] text-[var(--text-tertiary)] text-center mb-1">Sample Moon (28 days)</div>
         <div className="grid grid-cols-7 gap-0.5">
-          {/* Headers */}
-          {DAY_NAMES.map((d, i) => (
-            <div key={`h${i}`} className="text-center text-[8px] font-bold text-[#c084fc] pb-0.5">{d}</div>
+          {/* Headers — full day names */}
+          {DAY_FULL_NAMES.map((name, i) => (
+            <div key={`h${i}`} className="text-center text-[7px] font-bold text-[#c084fc] pb-0.5 leading-tight">{name}</div>
           ))}
           {/* Days 1-28 */}
           {Array.from({ length: 28 }, (_, i) => (
@@ -292,20 +296,18 @@ function StepMoons() {
 // ===================== Step 5: 260 Kin Grid =====================
 
 function StepTzolkin({ hoveredKin, setHoveredKin }: { hoveredKin: number | null; setHoveredKin: (k: number | null) => void }) {
-  // CRT: kin = 1 + (221*s + 40*t) % 260
+  const castleColors = ['#ef4444', '#d4d0c8', '#3b82f6', '#eab308', '#22c55e'];
+
+  // Column-first: each column = one seal, each row = one tone
+  // Kin = col * 13 + row + 1; castle colour by column group (4 cols each)
   const grid = useMemo(() => {
     const cells: { kin: number; seal: number; tone: number; colour: string; castleColour: string }[] = [];
-    for (let t = 0; t < 13; t++) {
-      for (let s = 0; s < 20; s++) {
-        const kin = 1 + (221 * s + 40 * t) % 260;
-        const sealColour = SEALS[s].colourHex;
-        let castleColour: string;
-        if (kin <= 52) castleColour = '#ef4444';
-        else if (kin <= 104) castleColour = '#e0ddd6';
-        else if (kin <= 156) castleColour = '#3b82f6';
-        else if (kin <= 208) castleColour = '#eab308';
-        else castleColour = '#22c55e';
-        cells.push({ kin, seal: s, tone: t, colour: sealColour, castleColour });
+    for (let row = 0; row < 13; row++) {
+      for (let col = 0; col < 20; col++) {
+        const kin = col * 13 + row + 1;
+        const sealColour = SEALS[col].colourHex;
+        const castleColour = castleColors[Math.floor(col / 4)];
+        cells.push({ kin, seal: col, tone: row, colour: sealColour, castleColour });
       }
     }
     return cells;
@@ -344,7 +346,7 @@ function StepTzolkin({ hoveredKin, setHoveredKin }: { hoveredKin: number | null;
               style={{
                 background: hoveredKin === cell.kin
                   ? cell.colour
-                  : cell.castleColour + '20',
+                  : cell.castleColour + 'B3',
                 border: hoveredKin === cell.kin ? `1px solid ${cell.colour}` : '0.5px solid rgba(255,255,255,0.04)',
                 minWidth: 12,
                 minHeight: 12,
@@ -365,7 +367,7 @@ function StepTzolkin({ hoveredKin, setHoveredKin }: { hoveredKin: number | null;
           { name: 'Green', colour: '#22c55e' },
         ].map(c => (
           <div key={c.name} className="flex items-center gap-0.5">
-            <div className="w-2 h-2 rounded-sm" style={{ background: c.colour + '40' }} />
+            <div className="w-2 h-2 rounded-sm" style={{ background: c.colour + 'B3' }} />
             <span className="text-[var(--text-tertiary)]">{c.name}</span>
           </div>
         ))}
@@ -379,46 +381,75 @@ function StepTzolkin({ hoveredKin, setHoveredKin }: { hoveredKin: number | null;
 function StepHowItFits() {
   return (
     <div className="space-y-4 text-center">
-      {/* Two interlocking gears conceptual */}
-      <div className="relative mx-auto" style={{ width: 200, height: 120 }}>
-        <svg viewBox="0 0 200 120" className="w-full h-full">
-          {/* Outer gear (20-tooth) */}
-          <circle cx={80} cy={60} r={45} fill="none" stroke="#ef4444" strokeWidth={1.5} opacity={0.4} />
-          {Array.from({ length: 20 }, (_, i) => {
-            const a = (i / 20) * Math.PI * 2 - Math.PI / 2;
-            return (
-              <line
-                key={`o${i}`}
-                x1={80 + Math.cos(a) * 42}
-                y1={60 + Math.sin(a) * 42}
-                x2={80 + Math.cos(a) * 50}
-                y2={60 + Math.sin(a) * 50}
-                stroke="#ef4444"
-                strokeWidth={2}
-                opacity={0.5}
-              />
-            );
-          })}
-          <text x={80} y={63} textAnchor="middle" fill="#ef4444" fontSize={11} fontWeight="bold">20</text>
+      {/* Two interlocking gears */}
+      <div className="relative mx-auto" style={{ width: 220, height: 130 }}>
+        <svg viewBox="0 0 220 130" className="w-full h-full">
+          <defs>
+            <radialGradient id="meshGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#c084fc" stopOpacity={0.5} />
+              <stop offset="100%" stopColor="#c084fc" stopOpacity={0} />
+            </radialGradient>
+          </defs>
 
-          {/* Inner gear (13-tooth) */}
-          <circle cx={135} cy={60} r={30} fill="none" stroke="#3b82f6" strokeWidth={1.5} opacity={0.4} />
-          {Array.from({ length: 13 }, (_, i) => {
-            const a = (i / 13) * Math.PI * 2 - Math.PI / 2;
+          {/* Left gear (20-tooth) — larger */}
+          {(() => {
+            const cx = 78, cy = 65, r = 42, teeth = 20, toothH = 8, toothW = 0.09;
             return (
-              <line
-                key={`i${i}`}
-                x1={135 + Math.cos(a) * 27}
-                y1={60 + Math.sin(a) * 27}
-                x2={135 + Math.cos(a) * 34}
-                y2={60 + Math.sin(a) * 34}
-                stroke="#3b82f6"
-                strokeWidth={2}
-                opacity={0.5}
-              />
+              <>
+                <circle cx={cx} cy={cy} r={r} fill="rgba(239,68,68,0.06)" stroke="#ef4444" strokeWidth={1} opacity={0.5} />
+                {Array.from({ length: teeth }, (_, i) => {
+                  const a = (i / teeth) * Math.PI * 2 - Math.PI / 2;
+                  const a1 = a - toothW, a2 = a + toothW;
+                  const ix1 = cx + Math.cos(a1) * r, iy1 = cy + Math.sin(a1) * r;
+                  const ix2 = cx + Math.cos(a2) * r, iy2 = cy + Math.sin(a2) * r;
+                  const ox1 = cx + Math.cos(a1) * (r + toothH), oy1 = cy + Math.sin(a1) * (r + toothH);
+                  const ox2 = cx + Math.cos(a2) * (r + toothH), oy2 = cy + Math.sin(a2) * (r + toothH);
+                  return (
+                    <polygon
+                      key={`lt${i}`}
+                      points={`${ix1},${iy1} ${ox1},${oy1} ${ox2},${oy2} ${ix2},${iy2}`}
+                      fill="#ef4444"
+                      opacity={0.55}
+                    />
+                  );
+                })}
+                <text x={cx} y={cy - 4} textAnchor="middle" fill="#ef4444" fontSize={13} fontWeight="bold">20</text>
+                <text x={cx} y={cy + 10} textAnchor="middle" fill="#ef4444" fontSize={8} opacity={0.7}>seals</text>
+              </>
             );
-          })}
-          <text x={135} y={63} textAnchor="middle" fill="#3b82f6" fontSize={11} fontWeight="bold">13</text>
+          })()}
+
+          {/* Right gear (13-tooth) — smaller */}
+          {(() => {
+            const cx = 145, cy = 65, r = 28, teeth = 13, toothH = 8, toothW = 0.13;
+            return (
+              <>
+                <circle cx={cx} cy={cy} r={r} fill="rgba(59,130,246,0.06)" stroke="#3b82f6" strokeWidth={1} opacity={0.5} />
+                {Array.from({ length: teeth }, (_, i) => {
+                  const a = (i / teeth) * Math.PI * 2 - Math.PI / 2;
+                  const a1 = a - toothW, a2 = a + toothW;
+                  const ix1 = cx + Math.cos(a1) * r, iy1 = cy + Math.sin(a1) * r;
+                  const ix2 = cx + Math.cos(a2) * r, iy2 = cy + Math.sin(a2) * r;
+                  const ox1 = cx + Math.cos(a1) * (r + toothH), oy1 = cy + Math.sin(a1) * (r + toothH);
+                  const ox2 = cx + Math.cos(a2) * (r + toothH), oy2 = cy + Math.sin(a2) * (r + toothH);
+                  return (
+                    <polygon
+                      key={`rt${i}`}
+                      points={`${ix1},${iy1} ${ox1},${oy1} ${ox2},${oy2} ${ix2},${iy2}`}
+                      fill="#3b82f6"
+                      opacity={0.55}
+                    />
+                  );
+                })}
+                <text x={cx} y={cy - 4} textAnchor="middle" fill="#3b82f6" fontSize={13} fontWeight="bold">13</text>
+                <text x={cx} y={cy + 10} textAnchor="middle" fill="#3b82f6" fontSize={8} opacity={0.7}>tones</text>
+              </>
+            );
+          })()}
+
+          {/* Mesh point glow where gears touch */}
+          <circle cx={114} cy={65} r={10} fill="url(#meshGlow)" />
+          <line x1={114} y1={55} x2={114} y2={75} stroke="#c084fc" strokeWidth={0.5} opacity={0.4} strokeDasharray="2 2" />
         </svg>
       </div>
 
@@ -447,7 +478,7 @@ function StepHowItFits() {
 // ===================== Shared Components =====================
 
 function ToneGlyph({ bars, dots, size }: { bars: number; dots: number; size: number }) {
-  const colour = '#c084fc';
+  const colour = '#e8e6df'; // white
   const dotR = size * 0.12;
   const dotSpacing = size * 0.28;
   const barW = size * 0.7;
@@ -458,7 +489,7 @@ function ToneGlyph({ bars, dots, size }: { bars: number; dots: number; size: num
   const dotsH = dots > 0 ? dotR * 2 : 0;
   const barsH = bars > 0 ? (bars - 1) * barGap + barH : 0;
   const gapH = dots > 0 && bars > 0 ? sectionGap : 0;
-  const totalH = dotsH + gapH + barsH;
+  const totalH = barsH + gapH + dotsH;
   const svgH = Math.max(totalH, size * 0.2) + 2;
   const svgW = Math.max(barW, dots > 0 ? (dots - 1) * dotSpacing + dotR * 2 : 0) + 2;
   const midX = svgW / 2;
@@ -466,20 +497,23 @@ function ToneGlyph({ bars, dots, size }: { bars: number; dots: number; size: num
   const elements: React.ReactNode[] = [];
   let curY = 1;
 
-  if (dots > 0) {
-    const dotsW = (dots - 1) * dotSpacing;
-    const startX = midX - dotsW / 2;
-    for (let d = 0; d < dots; d++) {
-      elements.push(<circle key={`d${d}`} cx={startX + d * dotSpacing} cy={curY + dotR} r={dotR} fill={colour} />);
-    }
-    curY += dotsH + gapH;
-  }
+  // Bars on top
   if (bars > 0) {
     for (let b = 0; b < bars; b++) {
       elements.push(
         <rect key={`b${b}`} x={midX - barW / 2} y={curY} width={barW} height={barH} rx={barH * 0.3} fill={colour} />
       );
       curY += barGap;
+    }
+    if (dots > 0) curY += sectionGap - barGap + (bars > 0 ? 0 : 0);
+  }
+  // Dots below (horizontal row)
+  if (dots > 0) {
+    const dotsW = (dots - 1) * dotSpacing;
+    const startX = midX - dotsW / 2;
+    const dotCY = bars > 0 ? barsH + sectionGap + 1 + dotR : 1 + dotR;
+    for (let d = 0; d < dots; d++) {
+      elements.push(<circle key={`d${d}`} cx={startX + d * dotSpacing} cy={dotCY} r={dotR} fill={colour} />);
     }
   }
 
