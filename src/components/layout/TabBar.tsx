@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 
 const TABS = [
   { href: '/', label: 'Today', icon: ClockIcon },
+  { href: '/daily', label: 'Daily', icon: ArticleIcon },
   { href: '/my-kin', label: 'My Kin', icon: PersonIcon },
   { href: '/thirteen-moons', label: '13 Moons', icon: CalendarIcon },
   { href: '/wavespell', label: 'Wavespell', icon: CirclesIcon },
@@ -32,7 +33,7 @@ export default function TabBar() {
             <Link
               key={href}
               href={href}
-              className={`tap-feedback flex flex-col items-center gap-1 px-3 py-2 transition-colors ${
+              className={`tap-feedback flex flex-col items-center gap-1 px-2 py-2 transition-colors ${
                 active ? 'text-[var(--purple)]' : 'text-[var(--text-tertiary)]'
               }`}
             >
@@ -79,6 +80,15 @@ function CirclesIcon({ className }: { className?: string }) {
       <circle cx="12" cy="12" r="10" />
       <circle cx="12" cy="12" r="6" />
       <circle cx="12" cy="12" r="2" />
+    </svg>
+  );
+}
+
+function ArticleIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+      <path d="M4 4h16a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z" />
+      <path d="M7 8h10M7 12h6M7 16h8" />
     </svg>
   );
 }

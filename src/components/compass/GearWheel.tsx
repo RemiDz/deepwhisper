@@ -337,7 +337,7 @@ function drawGears(
     ctx.closePath();
 
     ctx.fillStyle = '#c084fc';
-    ctx.globalAlpha = isActive ? 0.2 : 0.04;
+    ctx.globalAlpha = isActive ? 0.2 : 0.08;
     ctx.fill();
     ctx.globalAlpha = 1;
   }
@@ -352,7 +352,7 @@ function drawGears(
     ctx.save();
     ctx.translate(tx, ty);
     ctx.rotate(a - Math.PI / 2);  // MINUS — bars face outward
-    ctx.globalAlpha = isActive ? 1 : 0.5;
+    ctx.globalAlpha = isActive ? 1 : 0.65;
     drawRadialDotBar(ctx, i + 1, isActive, isActive ? 1.4 : 0.9);
     ctx.globalAlpha = 1;
     ctx.restore();
@@ -416,11 +416,11 @@ function drawGears(
     ctx.clip();
     const img = sealImages[i];
     if (img && img.complete) {
-      ctx.globalAlpha = isActive ? 1 : 0.3;
+      ctx.globalAlpha = isActive ? 1 : 0.7;
       ctx.drawImage(img, -sz / 2, -sz / 2, sz, sz);
     } else {
       // Placeholder colour fill while loading
-      ctx.globalAlpha = isActive ? 0.5 : 0.15;
+      ctx.globalAlpha = isActive ? 0.5 : 0.35;
       ctx.fillStyle = SEALS[i].bgHex;
       ctx.fill();
     }
@@ -479,7 +479,7 @@ function drawRadialDotBar(
 
   let sy = -totalH / 2;
 
-  const col = active ? '#ffffff' : 'rgba(255,255,255,0.4)';
+  const col = active ? '#ffffff' : 'rgba(255,255,255,0.7)';
   ctx.fillStyle = col;
 
   // Draw bars stacked vertically (each bar is a horizontal line)

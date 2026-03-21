@@ -216,12 +216,6 @@ export default function TodayPage() {
     );
   }
 
-  // Get an affirmation snippet (first line of declaration)
-  const declaration = getDeclaration(kin.number);
-  const affirmationSnippet = declaration
-    ? declaration.declaration.split('\n').find(l => l.trim())?.trim() || ''
-    : '';
-
   return (
     <>
       <div className="max-w-md mx-auto px-3 pt-2 pb-20 overflow-y-auto h-full" style={{ WebkitOverflowScrolling: 'touch' }}>
@@ -297,25 +291,6 @@ export default function TodayPage() {
           </div>
           {dayOffset !== 0 && (
             <span className="text-[10px] text-[var(--text-tertiary)]">{viewedDateLabel}</span>
-          )}
-        </div>
-
-        {/* Kin name + affirmation */}
-        <div className="text-center mb-2">
-          <div className="text-lg font-semibold" style={{ color: kin.seal.colourHex }}>
-            {kin.title}
-          </div>
-          <div className="flex items-center justify-center gap-2 text-[11px] text-[var(--text-secondary)] mt-0.5">
-            <span>Kin {kin.number}</span>
-            <span className="opacity-40">·</span>
-            <span>Tone {kin.tone.number}</span>
-            <span className="opacity-40">·</span>
-            <span>Seal {kin.seal.number + 1}</span>
-          </div>
-          {affirmationSnippet && (
-            <p className="text-[11px] text-[var(--text-tertiary)] italic mt-1 max-w-[280px] mx-auto leading-snug">
-              &ldquo;{affirmationSnippet}&rdquo;
-            </p>
           )}
         </div>
 
