@@ -8,6 +8,7 @@ const TABS = [
   { href: '/my-kin', label: 'My Kin', icon: PersonIcon },
   { href: '/thirteen-moons', label: '13 Moons', icon: CalendarIcon },
   { href: '/wavespell', label: 'Wavespell', icon: CirclesIcon },
+  { href: '/learn', label: 'Learn', icon: BookIcon },
 ];
 
 export default function TabBar() {
@@ -31,7 +32,7 @@ export default function TabBar() {
             <Link
               key={href}
               href={href}
-              className={`tap-feedback flex flex-col items-center gap-1 px-4 py-2 transition-colors ${
+              className={`tap-feedback flex flex-col items-center gap-1 px-3 py-2 transition-colors ${
                 active ? 'text-[var(--purple)]' : 'text-[var(--text-tertiary)]'
               }`}
             >
@@ -78,6 +79,15 @@ function CirclesIcon({ className }: { className?: string }) {
       <circle cx="12" cy="12" r="10" />
       <circle cx="12" cy="12" r="6" />
       <circle cx="12" cy="12" r="2" />
+    </svg>
+  );
+}
+
+function BookIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2V3Z" />
+      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7V3Z" />
     </svg>
   );
 }

@@ -1,13 +1,13 @@
 'use client';
 
 import { useMemo, useState, useCallback } from 'react';
-import { getKinForDateFull } from '@/lib/dreamspell/kin';
+import { getKinForDateFull, buildKin } from '@/lib/dreamspell/kin';
 import { getOracle } from '@/lib/dreamspell/oracle';
 import { getMoonDate } from '@/lib/dreamspell/moons';
 import { getMoonData } from '@/lib/astronomy/moon';
 import { SEALS } from '@/lib/dreamspell/seals';
 import { getSealDescription, getToneDescription, getDeclaration } from '@/lib/galactic-content';
-import GalacticCompass from '@/components/compass/GalacticCompass';
+import GearWheel from '@/components/compass/GearWheel';
 import KinStrip from '@/components/today/KinStrip';
 import MicroDashboard from '@/components/today/MicroDashboard';
 import MilestoneCard from '@/components/today/MilestoneCard';
@@ -18,12 +18,26 @@ import DeclarationCard from '@/components/today/DeclarationCard';
 
 export default function TodayPage() {
   const [sheetContent, setSheetContent] = useState<{ title: string; body: React.ReactNode } | null>(null);
+  const [dayOffset, setDayOffset] = useState(0);
 
-  const today = useMemo(() => new Date(), []);
-  const kin = useMemo(() => getKinForDateFull(today), [today]);
+  // Compute target date from offset
+  const targetDate = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + dayOffset);
+    return d;
+  }, [dayOffset]);
+
+  const kin = useMemo(() => getKinForDateFull(targetDate), [targetDate]);
   const oracle = useMemo(() => kin ? getOracle(kin) : null, [kin]);
-  const moonData = useMemo(() => getMoonData(today), [today]);
-  const moonDate = useMemo(() => getMoonDate(today), [today]);
+  const moonData = useMemo(() => getMoonData(targetDate), [targetDate]);
+  const moonDate = useMemo(() => getMoonDate(targetDate), [targetDate]);
+
+  const sealIndex = kin ? (kin.number - 1) % 20 : 0;
+  const toneIndex = kin ? (kin.number - 1) % 13 : 0;
+
+  const handleDayChange = useCallback((delta: number) => {
+    setDayOffset(prev => prev + delta);
+  }, []);
 
   const handleCentreTap = useCallback(() => {
     if (!kin || !oracle) return;
@@ -95,7 +109,6 @@ export default function TodayPage() {
     const antipodeSeal = SEALS[(seal.number + 10) % 20];
     const occultSeal = SEALS[(19 - seal.number + 20) % 20];
     const isActive = kin ? sealNumber === kin.seal.number : false;
-    // The 13 Kins for this seal: sealIndex + 1, sealIndex + 21, sealIndex + 41, ...
     const sealKins = Array.from({ length: 13 }, (_, i) => seal.number + i * 20 + 1);
     setSheetContent({
       title: `Solar Seal: ${seal.colour} ${seal.name}`,
@@ -162,6 +175,13 @@ export default function TodayPage() {
     });
   }, [kin]);
 
+  // Format the viewed date (shown separately when navigating away from today)
+  const viewedDateLabel = useMemo(() => {
+    if (dayOffset === 0) return '';
+    const opts: Intl.DateTimeFormatOptions = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
+    return targetDate.toLocaleDateString('en-GB', opts);
+  }, [dayOffset, targetDate]);
+
   if (!kin || !oracle) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center px-6">
@@ -169,14 +189,43 @@ export default function TodayPage() {
         <p className="text-[var(--text-secondary)] text-sm mt-2">
           Today is the Day Out of Time — a day of pure being, beyond the count of days.
         </p>
+        <div className="flex items-center gap-3 mt-4">
+          <button
+            onClick={() => handleDayChange(-1)}
+            className="tap-feedback flex items-center justify-center w-9 h-9 rounded-full"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '0.5px solid rgba(255,255,255,0.08)' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+          </button>
+          <button
+            onClick={() => setDayOffset(0)}
+            className="tap-feedback px-5 py-1.5 rounded-full text-[11px] font-medium"
+            style={{ background: 'rgba(192,132,252,0.12)', color: '#c084fc', border: '0.5px solid rgba(192,132,252,0.2)' }}
+          >
+            Today
+          </button>
+          <button
+            onClick={() => handleDayChange(1)}
+            className="tap-feedback flex items-center justify-center w-9 h-9 rounded-full"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '0.5px solid rgba(255,255,255,0.08)' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+          </button>
+        </div>
       </div>
     );
   }
 
+  // Get an affirmation snippet (first line of declaration)
+  const declaration = getDeclaration(kin.number);
+  const affirmationSnippet = declaration
+    ? declaration.declaration.split('\n').find(l => l.trim())?.trim() || ''
+    : '';
+
   return (
     <>
       <div className="max-w-md mx-auto px-3 pt-2 pb-20 overflow-y-auto h-full" style={{ WebkitOverflowScrolling: 'touch' }}>
-        {/* Header — full width, no clipping */}
+        {/* Header */}
         <header className="text-center w-full">
           <h1 className="text-[10px] font-semibold tracking-[0.2em] text-[var(--text-tertiary)] uppercase">
             Deep Whisper
@@ -191,18 +240,86 @@ export default function TodayPage() {
           )}
         </header>
 
-        {/* Galactic Compass — centred */}
+        {/* Gear Wheel */}
         <div className="flex items-center justify-center py-2">
-          <GalacticCompass
-            kin={kin}
-            oracle={oracle}
+          <GearWheel
+            kinNumber={kin.number}
+            sealIndex={sealIndex}
+            toneIndex={toneIndex}
             moonData={moonData}
             onCentreTap={handleCentreTap}
             onSealTap={handleSealTap}
+            onDayChange={handleDayChange}
           />
         </div>
 
-        {/* Info below compass */}
+        {/* Navigation buttons */}
+        <div className="flex flex-col items-center -mt-1 mb-2 gap-1">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => handleDayChange(-1)}
+              className="tap-feedback flex items-center justify-center w-9 h-9 rounded-full transition-colors"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '0.5px solid rgba(255,255,255,0.08)',
+                backdropFilter: 'blur(8px)',
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+            <button
+              onClick={() => setDayOffset(0)}
+              className="tap-feedback px-5 py-1.5 rounded-full text-[11px] font-medium transition-colors"
+              style={{
+                background: dayOffset !== 0 ? 'rgba(192,132,252,0.12)' : 'rgba(255,255,255,0.04)',
+                color: dayOffset !== 0 ? '#c084fc' : 'var(--text-secondary)',
+                border: '0.5px solid ' + (dayOffset !== 0 ? 'rgba(192,132,252,0.2)' : 'rgba(255,255,255,0.08)'),
+                backdropFilter: 'blur(8px)',
+              }}
+            >
+              Today
+            </button>
+            <button
+              onClick={() => handleDayChange(1)}
+              className="tap-feedback flex items-center justify-center w-9 h-9 rounded-full transition-colors"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '0.5px solid rgba(255,255,255,0.08)',
+                backdropFilter: 'blur(8px)',
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+          </div>
+          {dayOffset !== 0 && (
+            <span className="text-[10px] text-[var(--text-tertiary)]">{viewedDateLabel}</span>
+          )}
+        </div>
+
+        {/* Kin name + affirmation */}
+        <div className="text-center mb-2">
+          <div className="text-lg font-semibold" style={{ color: kin.seal.colourHex }}>
+            {kin.title}
+          </div>
+          <div className="flex items-center justify-center gap-2 text-[11px] text-[var(--text-secondary)] mt-0.5">
+            <span>Kin {kin.number}</span>
+            <span className="opacity-40">·</span>
+            <span>Tone {kin.tone.number}</span>
+            <span className="opacity-40">·</span>
+            <span>Seal {kin.seal.number + 1}</span>
+          </div>
+          {affirmationSnippet && (
+            <p className="text-[11px] text-[var(--text-tertiary)] italic mt-1 max-w-[280px] mx-auto leading-snug">
+              &ldquo;{affirmationSnippet}&rdquo;
+            </p>
+          )}
+        </div>
+
+        {/* Info below wheel */}
         <div className="space-y-2">
           <KinStrip kin={kin} moonData={moonData} />
           <DeclarationCard kinNumber={kin.number} sealColourHex={kin.seal.colourHex} />
@@ -221,6 +338,8 @@ export default function TodayPage() {
     </>
   );
 }
+
+// ---------- Sub-components ----------
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
