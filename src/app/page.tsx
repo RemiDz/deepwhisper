@@ -281,7 +281,18 @@ export default function TodayPage() {
               </svg>
             </button>
             <button
-              onClick={() => { setDayOffset(0); gearRef.current?.startAnimation(); }}
+              onClick={() => {
+                setDayOffset(0);
+                // Compute today's indices directly to avoid stale state
+                const todayKin = getKinForDateFull(new Date());
+                if (todayKin) {
+                  const todaySeal = (todayKin.number - 1) % 20;
+                  const todayTone = (todayKin.number - 1) % 13;
+                  gearRef.current?.startAnimation(todaySeal, todayTone);
+                } else {
+                  gearRef.current?.startAnimation();
+                }
+              }}
               className="tap-feedback px-5 py-1.5 rounded-full text-[11px] font-medium transition-colors"
               style={{
                 background: dayOffset !== 0 ? 'rgba(192,132,252,0.12)' : 'rgba(255,255,255,0.04)',

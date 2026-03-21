@@ -17,10 +17,10 @@ const SEAL_COLORS = SEALS.map(s => s.colourHex);
    direction only — no reversal possible.
    ================================================================ */
 
-const CIN_DURATION = 5500;      // angle interpolation duration (ms)
-const CIN_ENGAGE_START = 5000;  // mesh zone pulse start
-const CIN_ENGAGE_DUR = 500;     // mesh zone pulse duration
-const CIN_TOTAL = 5500;         // total animation including engage
+const CIN_DURATION = 4000;      // angle interpolation duration (ms)
+const CIN_ENGAGE_START = 3600;  // mesh zone pulse start
+const CIN_ENGAGE_DUR = 400;     // mesh zone pulse duration
+const CIN_TOTAL = 4000;         // total animation including engage
 
 /**
  * Smooth ease-in-out: f(t) = t - sin(2πt) / (2π)
@@ -60,7 +60,7 @@ interface GearWheelProps {
 }
 
 export interface GearWheelHandle {
-  startAnimation: () => void;
+  startAnimation: (targetSealIndex?: number, targetToneIndex?: number) => void;
 }
 
 export default forwardRef<GearWheelHandle, GearWheelProps>(function GearWheel(
@@ -116,14 +116,17 @@ export default forwardRef<GearWheelHandle, GearWheelProps>(function GearWheel(
   const zodiacRef = useRef<HTMLDivElement>(null);
 
   // --- Start / replay animation ---
-  const startAnimation = useCallback(() => {
+  // Optional params allow caller to pass correct indices (avoids stale ref issue on Today press)
+  const startAnimation = useCallback((targetSealIndex?: number, targetToneIndex?: number) => {
     const c = cinRef.current;
     c.phase = 'running';
     c.startTime = performance.now();
 
-    // Target angles for today's Kin
-    const innerTarget = -(toneIndexRef.current / 13) * TAU;
-    const outerTarget = -(sealIndexRef.current / 20) * TAU;
+    // Use provided indices or fall back to current refs
+    const si = targetSealIndex ?? sealIndexRef.current;
+    const ti = targetToneIndex ?? toneIndexRef.current;
+    const innerTarget = -(ti / 13) * TAU;
+    const outerTarget = -(si / 20) * TAU;
 
     // Inner gear: 2 full rotations of clockwise approach (angle decreases)
     c.innerStart = innerTarget + TAU * 2;
@@ -256,9 +259,9 @@ export default forwardRef<GearWheelHandle, GearWheelProps>(function GearWheel(
         const drawInner = c.innerStart + (c.innerEnd - c.innerStart) * eased;
         const drawOuter = c.outerStart + (c.outerEnd - c.outerStart) * eased;
 
-        // Gear fade-in (inner 500-1200ms, outer 800-1500ms)
-        const fadeInner = Math.min(1, Math.max(0, (elapsed - 500) / 700));
-        const fadeOuter = Math.min(1, Math.max(0, (elapsed - 800) / 700));
+        // Gear fade-in (inner 200-800ms, outer 400-1000ms)
+        const fadeInner = Math.min(1, Math.max(0, (elapsed - 200) / 600));
+        const fadeOuter = Math.min(1, Math.max(0, (elapsed - 400) / 600));
 
         // Progressive reveal: seals/tones during first 55% of duration
         const revealEnd = CIN_DURATION * 0.55;
@@ -305,9 +308,9 @@ export default forwardRef<GearWheelHandle, GearWheelProps>(function GearWheel(
           pointerAlpha = 0.7;
         }
 
-        // Moon DOM opacity (fade in over 800ms)
-        const moonOpacity = Math.min(1, Math.max(0, elapsed / 800));
-        const moonTextOpacity = Math.min(1, Math.max(0, (elapsed - 300) / 700));
+        // Moon DOM opacity (fade in over 600ms)
+        const moonOpacity = Math.min(1, Math.max(0, elapsed / 600));
+        const moonTextOpacity = Math.min(1, Math.max(0, (elapsed - 200) / 600));
         if (moonContainerRef.current) moonContainerRef.current.style.opacity = String(moonOpacity);
         if (moonInfoRef.current) moonInfoRef.current.style.opacity = String(moonTextOpacity);
         if (zodiacRef.current) zodiacRef.current.style.opacity = String(moonTextOpacity);
