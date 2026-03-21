@@ -15,6 +15,7 @@ import BottomSheet from '@/components/layout/BottomSheet';
 import SealGlyph from '@/components/compass/SealGlyph';
 import SonicPrescription from '@/components/today/SonicPrescription';
 import DeclarationCard from '@/components/today/DeclarationCard';
+import EnergyIntensity from '@/components/energy/EnergyIntensity';
 
 export default function TodayPage() {
   const [sheetContent, setSheetContent] = useState<{ title: string; body: React.ReactNode } | null>(null);
@@ -297,6 +298,7 @@ export default function TodayPage() {
         {/* Info below wheel */}
         <div className="space-y-2">
           <KinStrip kin={kin} moonData={moonData} />
+          <EnergyIntensity sealIndex={sealIndex} toneIndex={toneIndex} />
           <DeclarationCard kinNumber={kin.number} sealColourHex={kin.seal.colourHex} />
           <MicroDashboard kin={kin} />
           <MilestoneCard kin={kin} />
