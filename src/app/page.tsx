@@ -296,7 +296,7 @@ export default function TodayPage() {
         </div>
 
         {/* Info below wheel */}
-        <div className="space-y-2">
+        <div className="space-y-3">
           <KinStrip kin={kin} moonData={moonData} />
           <EnergyIntensity sealIndex={sealIndex} toneIndex={toneIndex} />
           <DeclarationCard kinNumber={kin.number} sealColourHex={kin.seal.colourHex} />

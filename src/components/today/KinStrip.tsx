@@ -10,15 +10,14 @@ interface KinStripProps {
 
 export default function KinStrip({ kin, moonData }: KinStripProps) {
   return (
-    <div className="text-center space-y-1 overflow-visible w-full px-4">
-      {/* Kin number — large, bold, separate line */}
-      <div className="text-[32px] font-bold tabular-nums leading-none text-white">
-        {kin.number}
-      </div>
-
-      {/* Full title — seal colour, separate line */}
-      <div className="text-[17px] font-semibold leading-tight" style={{ color: kin.seal.colourHex }}>
-        {kin.title}
+    <div className="text-center overflow-visible w-full px-4" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+      {/* Kin number + name — single line */}
+      <div className="leading-tight">
+        <span className="text-[18px] font-bold text-white">Kin {kin.number}</span>
+        <span className="text-[18px] font-bold text-white"> · </span>
+        <span className="text-[18px] font-semibold" style={{ color: kin.seal.colourHex }}>
+          {kin.title}
+        </span>
         {kin.isGAP && (
           <span className="ml-2 text-[9px] font-semibold px-1.5 py-0.5 rounded bg-[var(--purple-dim)] text-[var(--purple)] align-middle">
             GAP
@@ -26,17 +25,19 @@ export default function KinStrip({ kin, moonData }: KinStripProps) {
         )}
       </div>
 
-      {/* Tone — bar-dot glyph + name + keywords */}
-      <div className="flex items-center justify-center gap-1.5 text-[11px] text-[var(--text-secondary)]">
+      {/* Tone info */}
+      <div className="flex items-center justify-center gap-1.5 text-[13px] text-[var(--text-secondary)]">
         <ToneBarDot tone={kin.tone.number} />
         <span>Tone {kin.tone.number} · {kin.tone.name}</span>
       </div>
-      <div className="text-[11px] text-[var(--text-secondary)]">
+
+      {/* Action words */}
+      <div className="text-[13px] text-[var(--text-secondary)]">
         {kin.tone.action} · {kin.tone.power} · {kin.tone.essence}
       </div>
 
       {/* Info pills */}
-      <div className="flex items-center justify-center gap-1.5 flex-wrap pt-0.5">
+      <div className="flex items-center justify-center gap-1.5 flex-wrap" style={{ paddingTop: 4 }}>
         <Pill label={moonData.zodiacSign} colour="var(--seal-blue)" />
         <Pill label={moonData.phaseName} />
         <Pill label={`${moonData.illumination}%`} />
