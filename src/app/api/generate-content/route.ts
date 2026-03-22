@@ -77,10 +77,17 @@ Rules:
 - Always include the Kin number, seal name, and tone name
 - If it's a Galactic Activation Portal day, lead with that — it's a big deal
 - If approaching a Wavespell or Castle change, build anticipation
-- Include the sound healing connection naturally (frequency, instrument) as a unique angle — this is what NO other Dreamspell account offers
-- Use emoji sparingly (🌀 for Kin, 🔮 for GAP days, 🔊 for sound healing)
+- Use emoji sparingly (🌀 for Kin, 🔮 for GAP days, 🔊 for sound/energy)
 - Never mention any app or product. Pure awareness content.
 - No "manifesting" or "abundance" language. Keep it real.
+
+SOUND HEALING REFERENCES — STRICT RULES:
+- You must NEVER suggest specific frequencies (e.g. "try 432 Hz", "listen to 1185 Hz").
+- You must NEVER recommend specific instruments (e.g. "use a Tibetan singing bowl", "try a crystal bowl", "play a gong").
+- You must NEVER prescribe sound healing protocols or tools. Our audience is TikTok — most viewers do not own instruments.
+- Instead, reference EXPERIENTIAL qualities of the daily energy: how it feels in the body, what emotions might surface, what dreams might carry, what intentions align with today's Kin.
+- You MAY use poetic/metaphorical sound language like "today carries a low hum of transformation" or "this energy vibrates with clarity" — but NEVER specific Hz values or instrument names.
+- If sound healing data is provided in the Dreamspell data block, use it ONLY to inform the FEELING and QUALITY of your writing — never to make direct tool recommendations to viewers.
 
 Include 8-12 relevant hashtags at the end of the description. Include: #dreamspell #13mooncalendar #galactickin #kin[NUMBER] #[sealname] #[tonename] #soundhealing #cosmicfrequency #galactictime #naturaltime`;
 
@@ -154,22 +161,12 @@ EARTH FAMILY: ${kinData.earthFamily}
 13 MOON DATE: ${kinData.moonName} Day ${kinData.dayOfMoon}
 GALACTIC ACTIVATION PORTAL: ${kinData.isGAP ? 'YES' : 'NO'}`;
 
-  if (forVoiceover) {
-    block += `
+  block += `
 
-SOUND HEALING (FOR TONAL CONTEXT ONLY — do NOT mention these values directly in the script):
+SOUND HEALING (FOR TONAL/EMOTIONAL CONTEXT ONLY — do NOT mention these values directly in the ${forVoiceover ? 'script' : 'captions'}):
 - Frequency: ${kinData.toneFrequency} Hz (${kinData.solfeggioNote})
 - Instrument: ${kinData.sealInstrument}
 - Quality: ${kinData.frequencyQuality}`;
-  } else {
-    block += `
-
-SOUND HEALING:
-- Frequency: ${kinData.toneFrequency} Hz (${kinData.solfeggioNote})
-- Instrument: ${kinData.sealInstrument}
-- Approach: ${kinData.instrumentApproach}
-- Quality: ${kinData.frequencyQuality}`;
-  }
 
   block += `
 
@@ -212,7 +209,7 @@ Generate 3 variations of TikTok content. Each variation must include:
 
 2. CAPTION_LINES: 3-5 short lines (each max 12 words). Bottom overlay text, revealed one at a time. Use emoji sparingly.
 
-3. DESCRIPTION: A 3-5 sentence TikTok description paragraph that expands on the Kin energy, connects it to collective experience, and includes the sound healing angle. Include 8-12 relevant hashtags at the end.
+3. DESCRIPTION: A 3-5 sentence TikTok description paragraph that expands on the Kin energy and connects it to collective experience. Reference the energy experientially — how it feels, what it stirs — but NEVER mention specific Hz values or instrument names. Include 8-12 relevant hashtags at the end.
 
 Format your response as JSON:
 {
