@@ -11,6 +11,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
     "astronomy-engine": "^2.1.19",
     "html2canvas-pro": "^2.0.2",
     "jspdf": "^4.2.1",
