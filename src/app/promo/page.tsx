@@ -20,6 +20,17 @@ interface TikTokVariation {
 }
 
 type VoiceoverStyle = 'story' | 'alert' | 'insight';
+type VoiceoverDuration = '15s' | '20s' | '30s' | '45s' | '60s';
+
+const DURATION_CONFIGS: Record<VoiceoverDuration, { min: number; max: number; label: string }> = {
+  '15s': { min: 35, max: 40, label: '15s (~35-40 words)' },
+  '20s': { min: 50, max: 55, label: '20s (~50-55 words)' },
+  '30s': { min: 75, max: 80, label: '30s (~75-80 words)' },
+  '45s': { min: 110, max: 120, label: '45s (~110-120 words)' },
+  '60s': { min: 155, max: 165, label: '60s (~155-165 words)' },
+};
+
+const DURATIONS: VoiceoverDuration[] = ['15s', '20s', '30s', '45s', '60s'];
 
 // ─── Helper: compute upcoming events ────────────────────────────────────
 
@@ -186,6 +197,7 @@ export default function PromoPage() {
   const [tiktokError, setTiktokError] = useState<string | null>(null);
 
   // Voiceover state
+  const [voDuration, setVoDuration] = useState<VoiceoverDuration>('20s');
   const [voStyle, setVoStyle] = useState<VoiceoverStyle>('story');
   const [voHook, setVoHook] = useState(false);
   const [voScript, setVoScript] = useState<string | null>(null);
@@ -239,7 +251,7 @@ export default function PromoPage() {
       const res = await fetch('/api/generate-content', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'voiceover', style: voStyle, hook: voHook, kinData: data.payload }),
+        body: JSON.stringify({ type: 'voiceover', style: voStyle, hook: voHook, duration: voDuration, kinData: data.payload }),
       });
       if (!res.ok) {
         const err = await res.json();
@@ -351,22 +363,46 @@ export default function PromoPage() {
       <div className="space-y-3">
         <h2 className="text-sm font-semibold text-[var(--purple)]">🎙️ Voiceover Script Generator</h2>
 
+        {/* Duration selector */}
+        <div className="space-y-1.5">
+          <div className="text-[10px] font-medium uppercase tracking-wider text-[var(--text-tertiary)]">Duration</div>
+          <div className="flex flex-wrap gap-1.5">
+            {DURATIONS.map(d => (
+              <button
+                key={d}
+                onClick={() => setVoDuration(d)}
+                className="h-8 rounded-lg text-[10px] font-medium px-3"
+                style={{
+                  background: voDuration === d ? 'var(--purple-dim)' : 'var(--bg-card)',
+                  color: voDuration === d ? 'var(--purple)' : 'var(--text-tertiary)',
+                  border: voDuration === d ? '0.5px solid rgba(192,132,252,0.3)' : '0.5px solid var(--border-subtle)',
+                }}
+              >
+                {DURATION_CONFIGS[d].label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Style selector */}
-        <div className="flex gap-2">
-          {(['story', 'alert', 'insight'] as const).map(s => (
-            <button
-              key={s}
-              onClick={() => setVoStyle(s)}
-              className="flex-1 h-9 rounded-lg text-[11px] font-medium capitalize"
-              style={{
-                background: voStyle === s ? 'var(--purple-dim)' : 'var(--bg-card)',
-                color: voStyle === s ? 'var(--purple)' : 'var(--text-tertiary)',
-                border: voStyle === s ? '0.5px solid rgba(192,132,252,0.3)' : '0.5px solid var(--border-subtle)',
-              }}
-            >
-              {s === 'story' ? 'Story' : s === 'alert' ? 'Alert' : 'Insight'}
-            </button>
-          ))}
+        <div className="space-y-1.5">
+          <div className="text-[10px] font-medium uppercase tracking-wider text-[var(--text-tertiary)]">Style</div>
+          <div className="flex gap-2">
+            {(['story', 'alert', 'insight'] as const).map(s => (
+              <button
+                key={s}
+                onClick={() => setVoStyle(s)}
+                className="flex-1 h-9 rounded-lg text-[11px] font-medium capitalize"
+                style={{
+                  background: voStyle === s ? 'var(--purple-dim)' : 'var(--bg-card)',
+                  color: voStyle === s ? 'var(--purple)' : 'var(--text-tertiary)',
+                  border: voStyle === s ? '0.5px solid rgba(192,132,252,0.3)' : '0.5px solid var(--border-subtle)',
+                }}
+              >
+                {s === 'story' ? 'Story' : s === 'alert' ? 'Alert' : 'Insight'}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Hook toggle */}
@@ -408,7 +444,7 @@ export default function PromoPage() {
               {voScript}
             </pre>
             <div className="text-[10px] text-[var(--text-tertiary)]">
-              {voWordCount} words · ~{voSeconds}s
+              {voWordCount} words · ~{Math.round(voWordCount / 2.5)}s (target: {voDuration})
             </div>
             <div className="flex gap-2">
               <button

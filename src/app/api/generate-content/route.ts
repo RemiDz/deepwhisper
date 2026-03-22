@@ -42,10 +42,21 @@ interface KinData {
   };
 }
 
+type VoiceoverDuration = '15s' | '20s' | '30s' | '45s' | '60s';
+
+const DURATION_CONFIGS: Record<VoiceoverDuration, { min: number; max: number; target: number; label: string }> = {
+  '15s': { min: 35, max: 40, target: 38, label: '15s (~35-40 words)' },
+  '20s': { min: 50, max: 55, target: 52, label: '20s (~50-55 words)' },
+  '30s': { min: 75, max: 80, target: 78, label: '30s (~75-80 words)' },
+  '45s': { min: 110, max: 120, target: 115, label: '45s (~110-120 words)' },
+  '60s': { min: 155, max: 165, target: 160, label: '60s (~155-165 words)' },
+};
+
 interface RequestBody {
   type: 'tiktok' | 'voiceover';
   style?: 'story' | 'alert' | 'insight';
   hook?: boolean;
+  duration?: VoiceoverDuration;
   kinData: KinData;
 }
 
@@ -73,17 +84,36 @@ Rules:
 
 Include 8-12 relevant hashtags at the end of the description. Include: #dreamspell #13mooncalendar #galactickin #kin[NUMBER] #[sealname] #[tonename] #soundhealing #cosmicfrequency #galactictime #naturaltime`;
 
-const VOICEOVER_SYSTEM_PROMPT = `You are a grounded Dreamspell narrator for TikTok voiceovers. You write scripts that sound natural when spoken aloud — conversational, flowing, with strategic pauses (marked with "...").
+function buildVoiceoverSystemPrompt(duration: VoiceoverDuration, hook: boolean): string {
+  const wc = DURATION_CONFIGS[duration];
+  const durationSec = duration.replace('s', '');
+
+  const hookText = hook
+    ? `After "Here's what the sky is doing." add ONE punchy hook sentence before the main body. Examples:
+- "Today's Kin hasn't appeared since 260 days ago."
+- "We're on day 12 of a 13-day cycle. The finale is tomorrow."
+- "This is a Galactic Activation Portal day. The veil is thin."
+This hook adds ~5-8 words, so reduce the body content accordingly to keep total at ~${wc.target} words.`
+    : 'After the signature opening line, go straight into the body content. No extra hook sentence needed.';
+
+  return `You are a grounded Dreamspell narrator for TikTok voiceovers. You write scripts that sound natural when spoken aloud — conversational, flowing, with strategic pauses (marked with "...").
 
 SIGNATURE HOOK — MANDATORY ON EVERY SCRIPT:
 - The script MUST always begin with exactly: "Here's what the sky is doing."
 - The script MUST always end with exactly: "Stay aligned."
 - These two lines are the channel's sonic branding. They never change regardless of style or topic.
-- The word count target (~90 words, ~35 seconds) INCLUDES these two signature lines.
-- The body content between the opening and closing should be ~80 words to keep total length at ~90 words.
+- The word count target INCLUDES these two signature lines.
 
 ASTRONOMICAL ACCURACY — HIGHEST PRIORITY:
 You are provided with computed Dreamspell data. This is the SINGLE SOURCE OF TRUTH. Every Kin number, seal name, tone name, wavespell, and castle claim must match the provided data exactly.
+
+SOUND HEALING REFERENCES — STRICT RULES:
+- You must NEVER suggest specific frequencies (e.g. "try 432 Hz", "listen to 1185 Hz").
+- You must NEVER recommend specific instruments (e.g. "use a Tibetan singing bowl", "try a crystal bowl").
+- You must NEVER prescribe sound healing protocols or tools. Our audience is TikTok — most viewers do not own instruments.
+- Instead, reference EXPERIENTIAL qualities of the daily energy: how it feels in the body, what emotions might surface, what dreams might carry, what intentions align with today's Kin.
+- You MAY use poetic/metaphorical sound language like "today carries a low hum of transformation" or "this energy vibrates with clarity" — but NEVER specific Hz values or instrument names.
+- If sound healing data is provided in the Dreamspell data block, use it only to inform the FEELING and QUALITY of your writing — never to make direct tool recommendations.
 
 STYLES:
 
@@ -91,24 +121,22 @@ Story: Weave the daily Kin into a narrative. "Today the Blue Crystal Wind is ask
 
 Alert: Urgent, punchy, news-style. "Kin 142. Blue Crystal Wind. Tone 12 just activated." Short sentences. Data-forward. State what's happening, what it means, what's coming next. Hit hard, hit fast.
 
-Insight: Reflective, thoughtful. "There's a reason today feels like you need to talk things through..." Start with the feeling, then reveal the Dreamspell data behind it. End with a sound healing recommendation — "528 Hz on a crystal singing bowl would ground this energy."
+Insight: Reflective, thoughtful. "There's a reason today feels like you need to talk things through..." Start with the feeling, then reveal the Dreamspell data behind it. Connect to how the energy lands in the body and emotions.
 
-ATTENTION HOOK (when toggle is ON):
-After "Here's what the sky is doing." add ONE punchy hook sentence before the main body. Examples:
-- "Today's Kin hasn't appeared since 260 days ago."
-- "We're on day 12 of a 13-day cycle. The finale is tomorrow."
-- "This is a Galactic Activation Portal day. The veil is thin."
-Reduce body to ~70 words to stay within ~90 word total.
+ATTENTION HOOK:
+${hookText}
 
 Rules:
+- Write EXACTLY ${wc.target} words (±5 words). This is critical — the script will be read aloud over a ${durationSec}-second video.
 - Include the Kin number, seal name, and tone name
 - Reference where we are in the wavespell (day X of 13)
-- Include the sound healing angle when it fits naturally (frequency + instrument)
 - Use pauses (...) for dramatic effect — these scripts are SPOKEN
 - Never mention any app or product
-- No "manifesting" or "abundance" language`;
+- No "manifesting" or "abundance" language
+- Write for the EAR, not the eye. Use short sentences. Use rhythm.`;
+}
 
-function buildKinDataBlock(kinData: KinData): string {
+function buildKinDataBlock(kinData: KinData, forVoiceover: boolean = false): string {
   let block = `Today is ${kinData.gregorianDate}. Here is the current Dreamspell data:
 
 KIN: ${kinData.kinNumber} — ${kinData.sealColour} ${kinData.toneName} ${kinData.sealName}
@@ -124,13 +152,26 @@ WAVESPELL: ${kinData.wavespellSeal} Wavespell — Day ${kinData.dayOfWavespell} 
 CASTLE: ${kinData.castleName} — Day ${kinData.dayOfCastle} of 52
 EARTH FAMILY: ${kinData.earthFamily}
 13 MOON DATE: ${kinData.moonName} Day ${kinData.dayOfMoon}
-GALACTIC ACTIVATION PORTAL: ${kinData.isGAP ? 'YES' : 'NO'}
+GALACTIC ACTIVATION PORTAL: ${kinData.isGAP ? 'YES' : 'NO'}`;
+
+  if (forVoiceover) {
+    block += `
+
+SOUND HEALING (FOR TONAL CONTEXT ONLY — do NOT mention these values directly in the script):
+- Frequency: ${kinData.toneFrequency} Hz (${kinData.solfeggioNote})
+- Instrument: ${kinData.sealInstrument}
+- Quality: ${kinData.frequencyQuality}`;
+  } else {
+    block += `
 
 SOUND HEALING:
 - Frequency: ${kinData.toneFrequency} Hz (${kinData.solfeggioNote})
 - Instrument: ${kinData.sealInstrument}
 - Approach: ${kinData.instrumentApproach}
-- Quality: ${kinData.frequencyQuality}
+- Quality: ${kinData.frequencyQuality}`;
+  }
+
+  block += `
 
 UPCOMING:
 - Next Wavespell: ${kinData.upcoming.nextWavespell} Wavespell starts in ${kinData.upcoming.daysUntilNextWavespell} days`;
@@ -149,13 +190,14 @@ UPCOMING:
 export async function POST(request: NextRequest) {
   try {
     const body: RequestBody = await request.json();
-    const { type, style, hook, kinData } = body;
+    const { type, style, hook, duration, kinData } = body;
 
     if (!kinData || !type) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const dataBlock = buildKinDataBlock(kinData);
+    const isVoiceover = type === 'voiceover';
+    const dataBlock = buildKinDataBlock(kinData, isVoiceover);
 
     let systemPrompt: string;
     let userMessage: string;
@@ -185,16 +227,19 @@ Format your response as JSON:
 
 Respond ONLY with the JSON. No preamble, no markdown backticks.`;
     } else {
-      systemPrompt = VOICEOVER_SYSTEM_PROMPT;
+      const voDuration: VoiceoverDuration = duration && DURATION_CONFIGS[duration] ? duration : '20s';
+      const wc = DURATION_CONFIGS[voDuration];
+      systemPrompt = buildVoiceoverSystemPrompt(voDuration, !!hook);
       userMessage = `${dataBlock}
 
 Generate a voiceover script in ${style || 'story'} style.
 Attention hook: ${hook ? 'ON' : 'OFF'}
 
+TARGET LENGTH: Write approximately ${wc.min}-${wc.max} words (~${voDuration.replace('s', '')} seconds when spoken aloud). The word count INCLUDES the signature opening ("Here's what the sky is doing.") and closing ("Stay aligned.") lines — adjust the body content length accordingly.
+
 The script must:
 - Open with "Here's what the sky is doing."
 - Close with "Stay aligned."
-- Be approximately 90 words (~35 seconds spoken)
 - Sound natural when read aloud
 - Use "..." for natural pauses
 
